@@ -74,7 +74,8 @@ export default function Header() {
       const size = Math.random() * 4 + 2;
       const intensity = Math.random() * 0.7 + 0.3;
       const duration = Math.random() * 5000 + 3000;
-      const hue = Math.random() > 0.7 ? 60 : 220; // Yellow or blue
+      // Use darker blues instead of yellow to match Thor theme
+      const hue = Math.random() > 0.7 ? 220 : 240; // Different shades of blue
       
       star.style.left = `${posX}px`;
       star.style.top = `${posY}px`;
@@ -120,9 +121,9 @@ export default function Header() {
 
   return (
     <header className="relative z-50">
-      {/* Enhanced starry night background */}
-      <div id="starry-bg" className="absolute inset-0 bg-indigo-950 overflow-hidden -z-10">
-        {/* Static star field with different densities */}
+      {/* Enhanced starry night background - now with darker blacks and blues */}
+      <div id="starry-bg" className="absolute inset-0 bg-black overflow-hidden -z-10">
+        {/* Static star field with different densities - darker background */}
         <div
           className="absolute inset-0"
           style={{
@@ -130,7 +131,7 @@ export default function Header() {
               radial-gradient(1px 1px at 25% 25%, white 1%, transparent 1%),
               radial-gradient(2px 2px at 75% 75%, rgba(255, 255, 255, 0.8) 1%, transparent 1%),
               radial-gradient(1.5px 1.5px at 50% 50%, rgba(255, 255, 255, 0.9) 1%, transparent 1%),
-              radial-gradient(1px 1px at 30% 70%, rgba(255, 255, 230, 0.7) 1%, transparent 1%),
+              radial-gradient(1px 1px at 30% 70%, rgba(200, 200, 255, 0.7) 1%, transparent 1%),
               radial-gradient(2.5px 2.5px at 80% 20%, rgba(255, 255, 255, 0.7) 1%, transparent 1%)
             `,
             backgroundSize: "200px 200px, 150px 150px, 100px 100px, 250px 250px, 300px 300px",
@@ -152,10 +153,10 @@ export default function Header() {
           }}
         ></div>
         
-        {/* Blue nebula effects */}
+        {/* Deep space nebula effects - darker blue tones */}
         <div className="absolute inset-0 opacity-30" 
           style={{
-            background: "radial-gradient(circle at 70% 20%, rgba(111, 126, 225, 0.4) 0%, transparent 25%), radial-gradient(circle at 30% 70%, rgba(146, 109, 222, 0.4) 0%, transparent 25%)"
+            background: "radial-gradient(circle at 70% 20%, rgba(32, 43, 100, 0.4) 0%, transparent 25%), radial-gradient(circle at 30% 70%, rgba(43, 36, 82, 0.4) 0%, transparent 25%)"
           }}
         ></div>
         
@@ -166,50 +167,50 @@ export default function Header() {
 
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          {/* Logo with glowing effect */}
+          {/* Logo with electric blue glow effect to match Thor theme */}
           <Link to="/" className="flex items-center">
             <span className="text-2xl font-bold text-white font-comic relative">
               Starry Comics
-              <span className="absolute inset-0 blur-sm text-yellow-200 opacity-70 animate-pulse">Starry Comics</span>
+              <span className="absolute inset-0 blur-sm text-blue-300 opacity-70 animate-pulse">Starry Comics</span>
             </span>
           </Link>
 
-          {/* Desktop Navigation with enhanced hover effects */}
+          {/* Desktop Navigation with enhanced hover effects - now with electric blue */}
           <nav className="hidden md:flex space-x-8">
             {["Home", "Shop", "Collections", "About"].map((item) => (
               <Link
                 key={item}
                 to={item === "Home" ? "/" : `/${item.toLowerCase()}`}
-                className="text-white hover:text-yellow-300 transition-all duration-300 font-medium relative group"
+                className="text-white hover:text-blue-300 transition-all duration-300 font-medium relative group"
               >
                 {item}
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-yellow-300 transition-all duration-300 group-hover:w-full"></span>
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-400 transition-all duration-300 group-hover:w-full"></span>
               </Link>
             ))}
           </nav>
 
-          {/* Enhanced Search Bar with glow effect */}
-          <div className="hidden md:flex items-center bg-indigo-900/30 rounded-full px-4 py-2 border border-indigo-700/50 shadow-[0_0_10px_rgba(122,122,255,0.3)]">
+          {/* Enhanced Search Bar with glow effect - matching Thor blue */}
+          <div className="hidden md:flex items-center bg-black/30 rounded-full px-4 py-2 border border-blue-900/50 shadow-[0_0_10px_rgba(0,191,255,0.3)]">
             <input
               type="text"
               placeholder="Search for superhero tees..."
-              className="bg-transparent text-white placeholder-indigo-300 focus:outline-none w-64"
+              className="bg-transparent text-white placeholder-blue-300 focus:outline-none w-64"
             />
-            <Search className="text-indigo-300 ml-2 hover:text-yellow-300 transition-colors cursor-pointer" size={20} />
+            <Search className="text-blue-300 ml-2 hover:text-blue-400 transition-colors cursor-pointer" size={20} />
           </div>
 
-          {/* Action Icons with badges and animations */}
+          {/* Action Icons with badges and animations - now with Thor blue */}
           <div className="flex items-center space-x-4">
-            <Link to="/wishlist" className="text-white hover:text-yellow-300 transition-all duration-300 transform hover:scale-110">
+            <Link to="/wishlist" className="text-white hover:text-blue-300 transition-all duration-300 transform hover:scale-110">
               <Heart size={24} />
             </Link>
-            <Link to="/cart" className="text-white hover:text-yellow-300 transition-all duration-300 transform hover:scale-110 relative">
+            <Link to="/cart" className="text-white hover:text-blue-300 transition-all duration-300 transform hover:scale-110 relative">
               <ShoppingCart size={24} />
-              <span className="absolute -top-2 -right-2 bg-yellow-400 text-indigo-900 rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold shadow-[0_0_5px_rgba(234,179,8,0.5)]">
+              <span className="absolute -top-2 -right-2 bg-blue-400 text-black rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold shadow-[0_0_5px_rgba(0,191,255,0.5)]">
                 3
               </span>
             </Link>
-            <Link to="/profile" className="text-white hover:text-yellow-300 transition-all duration-300 transform hover:scale-110">
+            <Link to="/profile" className="text-white hover:text-blue-300 transition-all duration-300 transform hover:scale-110">
               <User size={24} />
             </Link>
 
@@ -220,34 +221,34 @@ export default function Header() {
           </div>
         </div>
 
-        {/* Enhanced Mobile Menu with backdrop blur and animations */}
+        {/* Enhanced Mobile Menu with backdrop blur and animations - darkened */}
         {isMenuOpen && (
-          <div className="md:hidden absolute top-full left-0 right-0 bg-indigo-900/80 backdrop-blur-md p-4 border-t border-indigo-700 animate-fadeIn">
+          <div className="md:hidden absolute top-full left-0 right-0 bg-black/80 backdrop-blur-md p-4 border-t border-blue-900 animate-fadeIn">
             <nav className="flex flex-col space-y-4">
               {["Home", "Shop", "Collections", "About"].map((item) => (
                 <Link
                   key={item}
                   to={item === "Home" ? "/" : `/${item.toLowerCase()}`}
-                  className="text-white hover:text-yellow-300 transition-colors font-medium py-2 border-b border-indigo-800/30"
+                  className="text-white hover:text-blue-300 transition-colors font-medium py-2 border-b border-blue-900/30"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {item}
                 </Link>
               ))}
-              <div className="flex items-center bg-indigo-800/50 rounded-full px-4 py-2 border border-indigo-700/50 shadow-[0_0_8px_rgba(122,122,255,0.3)]">
+              <div className="flex items-center bg-black/50 rounded-full px-4 py-2 border border-blue-900/50 shadow-[0_0_8px_rgba(0,191,255,0.3)]">
                 <input
                   type="text"
                   placeholder="Search for superhero tees..."
-                  className="bg-transparent text-white placeholder-indigo-300 focus:outline-none w-full"
+                  className="bg-transparent text-white placeholder-blue-300 focus:outline-none w-full"
                 />
-                <Search className="text-indigo-300 ml-2 hover:text-yellow-300 transition-colors cursor-pointer" size={20} />
+                <Search className="text-blue-300 ml-2 hover:text-blue-400 transition-colors cursor-pointer" size={20} />
               </div>
             </nav>
           </div>
         )}
       </div>
       
-      {/* CSS for animations */}
+      {/* CSS for animations - updated for darker theme */}
       <style jsx>{`
         @keyframes star-rotation {
           0% { transform: rotate(0deg); }
@@ -269,7 +270,7 @@ export default function Header() {
           height: 2px;
           background: linear-gradient(to right, transparent, white, white, transparent);
           border-radius: 50%;
-          box-shadow: 0 0 5px 1px rgba(255, 255, 255, 0.6);
+          box-shadow: 0 0 5px 1px rgba(0, 191, 255, 0.6);
           animation: shoot linear forwards;
         }
         
