@@ -6,7 +6,7 @@ import { Mail, Lock, User, Eye, EyeOff, UserPlus, ArrowRight } from "lucide-reac
 
 const SignupForm = () => {
   const [formData, setFormData] = useState({
-    fullName: "",
+    name: "",  // Changed from fullName to name to match schema
     email: "",
     password: "",
     confirmPassword: "",
@@ -15,6 +15,8 @@ const SignupForm = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [step, setStep] = useState(1)
   const [selectedAvatar, setSelectedAvatar] = useState(null)
+  const [error, setError] = useState("")
+  const [loading, setLoading] = useState(false)
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -24,15 +26,65 @@ const SignupForm = () => {
     }))
   }
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    if (step === 1) {
-      setStep(2)
-    } else {
-      // Handle form submission
-      console.log("Form submitted:", formData, "Avatar:", selectedAvatar)
+  const validateForm = () => {
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match")
+      return false
     }
+    if (formData.password.length < 6) {
+      setError("Password must be at least 6 characters")
+      return false
+    }
+    setError("")
+    return true
   }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (step === 1) {
+      if (!validateForm()) return;
+      setStep(2);
+    } else {
+      if (!selectedAvatar) {
+        setError("Please select an avatar");
+        return;
+      }
+      
+      setLoading(true);
+      try {
+        const response = await fetch("http://localhost:5002/api/auth/signup", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: formData.name, // Using name that matches schema
+            email: formData.email,
+            password: formData.password,
+            profilePicture: selectedAvatar.toString(), // Convert to string
+            authProvider: 'local' // Explicitly setting auth provider
+          }),
+        });
+  
+        const data = await response.json();
+  
+        if (response.ok) {
+          console.log("Signup successful:", data);
+          // Redirect to login page
+          window.location.href = "/login";
+        } else {
+          setError(data.message || "Something went wrong during signup");
+        }
+      } catch (err) {
+        setError("Server error. Please try again later.");
+        console.error("Error submitting form:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+  
 
   // Superhero avatars
   const avatars = [
@@ -81,13 +133,19 @@ const SignupForm = () => {
 
         <div className="bg-white shadow-xl rounded-xl p-8 transform rotate-1">
           <div className="transform -rotate-1">
+            {error && (
+              <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+                {error}
+              </div>
+            )}
+            
             <form onSubmit={handleSubmit}>
               {step === 1 ? (
                 <>
                   {/* Step 1: Basic Information */}
                   <div className="rounded-md shadow-sm -space-y-px mb-6">
                     <div className="mb-4">
-                      <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-1">
+                      <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
                         Full Name
                       </label>
                       <div className="relative">
@@ -95,11 +153,11 @@ const SignupForm = () => {
                           <User className="h-5 w-5 text-gray-400" />
                         </div>
                         <input
-                          id="fullName"
-                          name="fullName"
+                          id="name"
+                          name="name"
                           type="text"
                           required
-                          value={formData.fullName}
+                          value={formData.name}
                           onChange={handleChange}
                           className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg"
                           placeholder="John Doe"
@@ -244,12 +302,12 @@ const SignupForm = () => {
                     </button>
                     <button
                       type="submit"
-                      disabled={!selectedAvatar}
+                      disabled={!selectedAvatar || loading}
                       className={`flex-1 py-3 px-4 border border-transparent rounded-lg text-white ${
-                        selectedAvatar ? "bg-indigo-600 hover:bg-indigo-700" : "bg-indigo-400 cursor-not-allowed"
+                        selectedAvatar && !loading ? "bg-indigo-600 hover:bg-indigo-700" : "bg-indigo-400 cursor-not-allowed"
                       } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
                     >
-                      Complete Sign Up
+                      {loading ? "Signing Up..." : "Complete Sign Up"}
                     </button>
                   </div>
                 </>
@@ -332,4 +390,3 @@ const SignupForm = () => {
 }
 
 export default SignupForm
-

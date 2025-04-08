@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { Mail, Lock, Eye, EyeOff, LogIn } from "lucide-react"
 
 const LoginForm = () => {
@@ -9,11 +9,66 @@ const LoginForm = () => {
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [rememberMe, setRememberMe] = useState(false)
+  const [error, setError] = useState("")
+  const [loading, setLoading] = useState(false)
+  const navigate = useNavigate()
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    // Handle login logic
-    console.log({ email, password, rememberMe })
+    setError("")
+    setLoading(true)
+    
+    try {
+      const response = await fetch("http://localhost:5002/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ 
+          email, 
+          password,
+          rememberMe 
+        }),
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        console.log("Login successful:", data)
+        
+        // Store token in localStorage or sessionStorage based on rememberMe
+        if (data.token) {
+          if (rememberMe) {
+            localStorage.setItem("token", data.token)
+          } else {
+            sessionStorage.setItem("token", data.token)
+          }
+          
+          // Store user data if needed
+          if (data.user) {
+            localStorage.setItem("user", JSON.stringify(data.user))
+          }
+          
+          // Redirect to dashboard or home page
+          navigate("/dashboard")
+        } else {
+          setError("Authentication successful but no token received")
+        }
+      } else {
+        setError(data.message || "Invalid email or password")
+      }
+    } catch (err) {
+      console.error("Error during login:", err)
+      setError("Server error. Please try again later.")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleGoogleLogin = () => {
+    // Implement Google OAuth login
+    // Typically redirects to Google auth endpoint
+    window.location.href = "http://localhost:5002/api/auth/google"
   }
 
   return (
@@ -43,6 +98,12 @@ const LoginForm = () => {
 
         <div className="bg-white shadow-xl rounded-xl p-8 transform rotate-1">
           <div className="transform -rotate-1">
+            {error && (
+              <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+                {error}
+              </div>
+            )}
+            
             <form className="space-y-6" onSubmit={handleSubmit}>
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700">
@@ -122,12 +183,13 @@ const LoginForm = () => {
               <div>
                 <button
                   type="submit"
+                  disabled={loading}
                   className="group relative w-full flex justify-center py-3 px-4 border border-transparent rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 items-center"
                 >
                   <span className="absolute left-0 inset-y-0 flex items-center pl-3">
                     <LogIn className="h-5 w-5 text-indigo-500 group-hover:text-indigo-400" />
                   </span>
-                  Sign in
+                  {loading ? "Signing in..." : "Sign in"}
                 </button>
               </div>
             </form>
@@ -145,6 +207,7 @@ const LoginForm = () => {
               <div className="mt-6">
                 <button
                   type="button"
+                  onClick={handleGoogleLogin}
                   className="w-full flex justify-center py-3 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 >
                   <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24">
@@ -205,4 +268,3 @@ const LoginForm = () => {
 }
 
 export default LoginForm
-
