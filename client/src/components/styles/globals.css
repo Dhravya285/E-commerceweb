@@ -1,0 +1,73 @@
+/* Star Animations for Login/Signup Forms */
+
+/* Shooting star animation */
+.shooting-star {
+    position: absolute;
+    height: 2px;
+    background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.8) 50%, rgba(240, 240, 255, 0));
+    animation: shooting-star-animation linear forwards;
+    opacity: 0;
+    z-index: 1;
+  }
+  
+  @keyframes shooting-star-animation {
+    0% {
+      transform: translateX(0) rotate(35deg) scale(1);
+      opacity: 0;
+    }
+    5% {
+      opacity: 1;
+    }
+    80% {
+      opacity: 1;
+    }
+    100% {
+      transform: translateX(500px) rotate(35deg) scale(0.2);
+      opacity: 0;
+    }
+  }
+  
+  /* Pulsating star */
+  .pulsating-star {
+    position: absolute;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.8);
+    animation: pulsate ease-in-out infinite;
+    z-index: 1;
+  }
+  
+  @keyframes pulsate {
+    0% {
+      transform: scale(1);
+      opacity: 0.3;
+    }
+    50% {
+      transform: scale(1.5);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 0.3;
+    }
+  }
+  
+  /* Glowing star */
+  .glowing-star {
+    position: absolute;
+    border-radius: 50%;
+    animation: glow ease-in-out infinite;
+    z-index: 1;
+  }
+  
+  @keyframes glow {
+    0% {
+      opacity: 0.5;
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.1);
+    }
+    100% {
+      opacity: 0.5;
+    }
+  }

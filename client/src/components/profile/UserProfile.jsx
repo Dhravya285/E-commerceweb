@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Link } from "react-router-dom"
 import { User, Package, Heart, CreditCard, LogOut, Edit, Camera, MapPin, Mail, Phone } from "lucide-react"
-import Navbar from "../layout/Navbar"
+import Header from "../layout/Header"
 import Footer from "../layout/Footer"
 
 // Sample user data
@@ -127,7 +127,7 @@ const UserProfilePage = () => {
 
   return (
     <>
-      <Navbar />
+      <Header/>
       <div className="bg-white">
         <div className="container mx-auto px-4 py-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">

@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Link } from "react-router-dom"
 import { Trash2, Plus, Minus, ShoppingBag, CreditCard, ChevronRight } from "lucide-react"
-// import Navbar from "../layout/Navbar"
+import Header from "../layout/Header"
 import Footer from "../layout/Footer"
 
 // Sample cart data
@@ -79,7 +79,7 @@ const CartPage = () => {
 
   return (
     <>
-      <Navbar />
+      <Header/>
       <div className="bg-white">
         <div className="container mx-auto px-4 py-8">
           <h1 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">

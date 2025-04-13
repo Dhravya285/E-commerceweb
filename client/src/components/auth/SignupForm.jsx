@@ -6,7 +6,7 @@ import { Mail, Lock, User, Eye, EyeOff, UserPlus, ArrowRight } from "lucide-reac
 
 const SignupForm = () => {
   const [formData, setFormData] = useState({
-    name: "",  // Changed from fullName to name to match schema
+    name: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -18,6 +18,9 @@ const SignupForm = () => {
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
 
+  // Animation effect hook would go here in a real implementation
+  // We'll include it in the JSX and style sections instead
+ 
   const handleChange = (e) => {
     const { name, value } = e.target
     setFormData((prev) => ({
@@ -59,11 +62,11 @@ const SignupForm = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            name: formData.name, // Using name that matches schema
+            name: formData.name,
             email: formData.email,
             password: formData.password,
-            profilePicture: selectedAvatar.toString(), // Convert to string
-            authProvider: 'local' // Explicitly setting auth provider
+            profilePicture: selectedAvatar.toString(),
+            authProvider: 'local'
           }),
         });
   
@@ -71,7 +74,6 @@ const SignupForm = () => {
   
         if (response.ok) {
           console.log("Signup successful:", data);
-          // Redirect to login page
           window.location.href = "/login";
         } else {
           setError(data.message || "Something went wrong during signup");
@@ -84,7 +86,6 @@ const SignupForm = () => {
       }
     }
   };
-  
 
   // Superhero avatars
   const avatars = [
@@ -102,39 +103,174 @@ const SignupForm = () => {
     { id: 12, name: "Ichigo", image: "/placeholder.svg?height=100&width=100" },
   ]
 
+  // Generate glowing stars dynamically
+  const renderGlowingStars = () => {
+    const stars = [];
+    for (let i = 0; i < 20; i++) {
+      const size = Math.random() * 3 + 1;
+      const top = Math.random() * 100;
+      const left = Math.random() * 100;
+      const delay = Math.random() * 5;
+      const duration = Math.random() * 3 + 2;
+      stars.push(
+        <div 
+          key={i}
+          className="glowing-star" 
+          style={{
+            width: `${size}px`,
+            height: `${size}px`,
+            top: `${top}%`,
+            left: `${left}%`,
+            boxShadow: `0 0 ${size * 2}px ${size/2}px rgba(255, 255, 255, 0.8)`,
+            animationDuration: `${duration}s`,
+            animationDelay: `${delay}s`
+          }}
+        />
+      );
+    }
+    return stars;
+  };
+
+  // Generate shooting stars
+  const renderShootingStars = () => {
+    const shootingStars = [];
+    for (let i = 0; i < 5; i++) {
+      const width = Math.random() * 100 + 50;
+      const top = Math.random() * 100;
+      const left = Math.random() * 50;
+      const delay = Math.random() * 15;
+      const duration = Math.random() * 2 + 1;
+      const angle = Math.random() * 60 - 30;
+      
+      shootingStars.push(
+        <div 
+          key={i}
+          className="shooting-star" 
+          style={{
+            width: `${width}px`,
+            top: `${top}%`,
+            left: `${left}%`,
+            transform: `rotate(${angle}deg)`,
+            animation: `shoot ${duration}s ${delay}s linear infinite`
+          }}
+        />
+      );
+    }
+    return shootingStars;
+  };
+
+  // Generate pulsating stars
+  const renderPulsatingStars = () => {
+    const stars = [];
+    for (let i = 0; i < 15; i++) {
+      const size = Math.random() * 2 + 1;
+      const top = Math.random() * 100;
+      const left = Math.random() * 100;
+      const delay = Math.random() * 5;
+      const duration = Math.random() * 3 + 3;
+      
+      stars.push(
+        <div 
+          key={i}
+          className="pulsating-star" 
+          style={{
+            width: `${size}px`,
+            height: `${size}px`,
+            top: `${top}%`,
+            left: `${left}%`,
+            boxShadow: `0 0 ${size * 3}px ${size}px rgba(100, 200, 255, 0.8)`,
+            animationDuration: `${duration}s`,
+            animationDelay: `${delay}s`
+          }}
+        />
+      );
+    }
+    return stars;
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-indigo-900 via-purple-900 to-indigo-800 py-12 px-4 sm:px-6 lg:px-8 relative">
-      {/* Stars background effect */}
-      <div className="absolute inset-0 overflow-hidden opacity-30 pointer-events-none">
-        {Array.from({ length: 100 }).map((_, i) => (
-          <div
-            key={i}
-            className="absolute rounded-full bg-white"
-            style={{
-              top: `${Math.random() * 100}%`,
-              left: `${Math.random() * 100}%`,
-              width: `${Math.random() * 3 + 1}px`,
-              height: `${Math.random() * 3 + 1}px`,
-              animation: `twinkle ${Math.random() * 5 + 3}s infinite`,
-            }}
-          />
-        ))}
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-gray-900 to-blue-950 relative overflow-hidden">
+      {/* Container for stars */}
+      <div id="starry-signup-bg" className="absolute inset-0 overflow-hidden">
+        {/* Enhanced star layers */}
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: `
+              radial-gradient(1px 1px at 25% 25%, white 1%, transparent 1%),
+              radial-gradient(2px 2px at 75% 75%, rgba(255, 255, 255, 0.8) 1%, transparent 1%),
+              radial-gradient(1.5px 1.5px at 50% 50%, rgba(255, 255, 255, 0.9) 1%, transparent 1%),
+              radial-gradient(1px 1px at 30% 70%, rgba(200, 200, 255, 0.7) 1%, transparent 1%),
+              radial-gradient(2.5px 2.5px at 80% 20%, rgba(255, 255, 255, 0.7) 1%, transparent 1%)
+            `,
+            backgroundSize: "200px 200px, 150px 150px, 100px 100px, 250px 250px, 300px 300px",
+            animation: "star-rotation 500s linear infinite"
+          }}
+        />
+        
+        {/* Secondary rotating star layer */}
+        <div
+          className="absolute inset-0 opacity-60"
+          style={{
+            backgroundImage: `
+              radial-gradient(1px 1px at 10% 10%, white 1%, transparent 1%),
+              radial-gradient(1.5px 1.5px at 60% 40%, white 1%, transparent 1%),
+              radial-gradient(1px 1px at 30% 80%, white 1%, transparent 1%)
+            `,
+            backgroundSize: "250px 250px, 300px 300px, 350px 350px",
+            animation: "star-rotation-reverse 600s linear infinite"
+          }}
+        />
+        
+        {/* Deep space nebula effects */}
+        <div className="absolute inset-0 opacity-30" 
+          style={{
+            background: "radial-gradient(circle at 70% 20%, rgba(32, 43, 100, 0.4) 0%, transparent 25%), radial-gradient(circle at 30% 70%, rgba(43, 36, 82, 0.4) 0%, transparent 25%)"
+          }}
+        />
+        
+        {/* Animated star clusters */}
+        <div className="star-cluster-1 absolute w-32 h-32 opacity-40"></div>
+        <div className="star-cluster-2 absolute w-40 h-40 opacity-40 right-0"></div>
+        
+        {/* New enhanced glowing stars */}
+        {renderGlowingStars()}
+        {renderPulsatingStars()}
+        {renderShootingStars()}
+        
+        {/* Additional nebula glow */}
+        <div className="absolute top-1/4 left-1/4 w-1/2 h-1/2 rounded-full opacity-20"
+          style={{
+            background: "radial-gradient(circle, rgba(0, 150, 255, 0.3) 0%, transparent 70%)",
+            filter: "blur(40px)",
+            animation: "nebula-pulse 8s infinite alternate ease-in-out"
+          }}
+        />
+        
+        <div className="absolute bottom-1/3 right-1/3 w-1/3 h-1/3 rounded-full opacity-15"
+          style={{
+            background: "radial-gradient(circle, rgba(100, 0, 255, 0.2) 0%, transparent 70%)",
+            filter: "blur(30px)",
+            animation: "nebula-pulse 12s infinite alternate-reverse ease-in-out"
+          }}
+        />
       </div>
 
       <div className="max-w-md w-full space-y-8 relative z-10">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-white">
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-white" 
+               style={{textShadow: "0 0 10px rgba(100, 200, 255, 0.7)"}}>
             {step === 1 ? "Create your account" : "Choose your superhero avatar"}
           </h2>
-          <p className="mt-2 text-center text-sm text-indigo-200">
+          <p className="mt-2 text-center text-sm text-blue-300">
             {step === 1 ? "Join our community of comic enthusiasts" : "Select an avatar that represents you"}
           </p>
         </div>
 
-        <div className="bg-white shadow-xl rounded-xl p-8 transform rotate-1">
+        <div className="bg-black/40 backdrop-blur-md rounded-xl p-8 transform rotate-1 border border-blue-900/50 shadow-[0_0_15px_rgba(0,191,255,0.3)]">
           <div className="transform -rotate-1">
             {error && (
-              <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+              <div className="mb-4 p-3 bg-red-900/30 border border-red-500/50 text-red-300 rounded-lg backdrop-blur-sm">
                 {error}
               </div>
             )}
@@ -145,12 +281,12 @@ const SignupForm = () => {
                   {/* Step 1: Basic Information */}
                   <div className="rounded-md shadow-sm -space-y-px mb-6">
                     <div className="mb-4">
-                      <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                      <label htmlFor="name" className="block text-sm font-medium text-blue-300 mb-1 text-glow-blue">
                         Full Name
                       </label>
                       <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <User className="h-5 w-5 text-gray-400" />
+                          <User className="h-5 w-5 text-blue-400" />
                         </div>
                         <input
                           id="name"
@@ -159,19 +295,19 @@ const SignupForm = () => {
                           required
                           value={formData.name}
                           onChange={handleChange}
-                          className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg"
+                          className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 pr-3 py-3 border border-blue-900/50 bg-black/30 text-white rounded-lg placeholder-blue-300/70 backdrop-blur-sm"
                           placeholder="John Doe"
                         />
                       </div>
                     </div>
 
                     <div className="mb-4">
-                      <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                      <label htmlFor="email" className="block text-sm font-medium text-blue-300 mb-1 text-glow-blue">
                         Email Address
                       </label>
                       <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <Mail className="h-5 w-5 text-gray-400" />
+                          <Mail className="h-5 w-5 text-blue-400" />
                         </div>
                         <input
                           id="email"
@@ -181,19 +317,19 @@ const SignupForm = () => {
                           required
                           value={formData.email}
                           onChange={handleChange}
-                          className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg"
+                          className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 pr-3 py-3 border border-blue-900/50 bg-black/30 text-white rounded-lg placeholder-blue-300/70 backdrop-blur-sm"
                           placeholder="you@example.com"
                         />
                       </div>
                     </div>
 
                     <div className="mb-4">
-                      <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                      <label htmlFor="password" className="block text-sm font-medium text-blue-300 mb-1 text-glow-blue">
                         Password
                       </label>
                       <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <Lock className="h-5 w-5 text-gray-400" />
+                          <Lock className="h-5 w-5 text-blue-400" />
                         </div>
                         <input
                           id="password"
@@ -203,14 +339,14 @@ const SignupForm = () => {
                           required
                           value={formData.password}
                           onChange={handleChange}
-                          className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg"
+                          className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 pr-10 py-3 border border-blue-900/50 bg-black/30 text-white rounded-lg placeholder-blue-300/70 backdrop-blur-sm"
                           placeholder="••••••••"
                         />
                         <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
                           <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
-                            className="text-gray-400 hover:text-gray-600 focus:outline-none"
+                            className="text-blue-400 hover:text-blue-300 focus:outline-none"
                           >
                             {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                           </button>
@@ -219,12 +355,12 @@ const SignupForm = () => {
                     </div>
 
                     <div>
-                      <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+                      <label htmlFor="confirmPassword" className="block text-sm font-medium text-blue-300 mb-1 text-glow-blue">
                         Confirm Password
                       </label>
                       <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <Lock className="h-5 w-5 text-gray-400" />
+                          <Lock className="h-5 w-5 text-blue-400" />
                         </div>
                         <input
                           id="confirmPassword"
@@ -234,14 +370,14 @@ const SignupForm = () => {
                           required
                           value={formData.confirmPassword}
                           onChange={handleChange}
-                          className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg"
+                          className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 pr-10 py-3 border border-blue-900/50 bg-black/30 text-white rounded-lg placeholder-blue-300/70 backdrop-blur-sm"
                           placeholder="••••••••"
                         />
                         <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
                           <button
                             type="button"
                             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                            className="text-gray-400 hover:text-gray-600 focus:outline-none"
+                            className="text-blue-400 hover:text-blue-300 focus:outline-none"
                           >
                             {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                           </button>
@@ -253,13 +389,13 @@ const SignupForm = () => {
                   <div>
                     <button
                       type="submit"
-                      className="group relative w-full flex justify-center py-3 px-4 border border-transparent rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 items-center"
+                      className="group relative w-full flex justify-center py-3 px-4 border border-blue-900/50 rounded-lg text-white bg-blue-900/30 hover:bg-blue-800/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 items-center shadow-[0_0_10px_rgba(0,191,255,0.3)] hover:shadow-[0_0_15px_rgba(0,191,255,0.5)] transition-all duration-300"
                     >
                       <span className="absolute left-0 inset-y-0 flex items-center pl-3">
-                        <UserPlus className="h-5 w-5 text-indigo-500 group-hover:text-indigo-400" />
+                        <UserPlus className="h-5 w-5 text-blue-400 group-hover:text-blue-300" />
                       </span>
                       Continue
-                      <ArrowRight className="ml-2 h-5 w-5" />
+                      <ArrowRight className="ml-2 h-5 w-5 text-blue-400 group-hover:text-blue-300" />
                     </button>
                   </div>
                 </>
@@ -267,7 +403,7 @@ const SignupForm = () => {
                 <>
                   {/* Step 2: Avatar Selection */}
                   <div className="mb-6">
-                    <p className="text-sm text-gray-600 mb-4">
+                    <p className="text-sm text-blue-300 mb-4">
                       Choose a superhero avatar that represents you. This will be displayed on your profile and reviews.
                     </p>
                     <div className="grid grid-cols-3 gap-4">
@@ -277,8 +413,8 @@ const SignupForm = () => {
                           onClick={() => setSelectedAvatar(avatar.id)}
                           className={`cursor-pointer rounded-lg p-2 transition-all ${
                             selectedAvatar === avatar.id
-                              ? "bg-indigo-100 border-2 border-indigo-600 transform scale-105"
-                              : "border border-gray-200 hover:border-indigo-300"
+                              ? "bg-blue-900/30 border-2 border-blue-500 transform scale-105 shadow-[0_0_10px_rgba(0,191,255,0.5)]"
+                              : "border border-blue-900/30 hover:border-blue-500/50 hover:shadow-[0_0_5px_rgba(0,191,255,0.3)]"
                           }`}
                         >
                           <img
@@ -286,7 +422,7 @@ const SignupForm = () => {
                             alt={avatar.name}
                             className="w-full h-auto rounded-full aspect-square object-cover"
                           />
-                          <p className="text-xs text-center mt-1 font-medium truncate">{avatar.name}</p>
+                          <p className="text-xs text-center mt-1 font-medium truncate text-blue-300">{avatar.name}</p>
                         </div>
                       ))}
                     </div>
@@ -296,16 +432,16 @@ const SignupForm = () => {
                     <button
                       type="button"
                       onClick={() => setStep(1)}
-                      className="flex-1 py-3 px-4 border border-gray-300 rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                      className="flex-1 py-3 px-4 border border-blue-900/50 rounded-lg text-blue-300 bg-black/50 hover:bg-blue-900/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300"
                     >
                       Back
                     </button>
                     <button
                       type="submit"
                       disabled={!selectedAvatar || loading}
-                      className={`flex-1 py-3 px-4 border border-transparent rounded-lg text-white ${
-                        selectedAvatar && !loading ? "bg-indigo-600 hover:bg-indigo-700" : "bg-indigo-400 cursor-not-allowed"
-                      } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
+                      className={`flex-1 py-3 px-4 border border-blue-900/50 rounded-lg text-white ${
+                        selectedAvatar && !loading ? "bg-blue-900/30 hover:bg-blue-800/50 shadow-[0_0_10px_rgba(0,191,255,0.3)] hover:shadow-[0_0_15px_rgba(0,191,255,0.5)]" : "bg-blue-900/10 cursor-not-allowed"
+                      } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300`}
                     >
                       {loading ? "Signing Up..." : "Complete Sign Up"}
                     </button>
@@ -315,9 +451,9 @@ const SignupForm = () => {
             </form>
 
             <div className="mt-6 text-center">
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-blue-300">
                 Already have an account?{" "}
-                <Link to="/login" className="font-medium text-indigo-600 hover:text-indigo-500">
+                <Link to="/login" className="font-medium text-blue-400 hover:text-blue-300 hover:underline transition-all duration-300">
                   Sign in
                 </Link>
               </p>
@@ -328,17 +464,17 @@ const SignupForm = () => {
               <div className="mt-6">
                 <div className="relative">
                   <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-gray-300"></div>
+                    <div className="w-full border-t border-blue-900/30"></div>
                   </div>
                   <div className="relative flex justify-center text-sm">
-                    <span className="px-2 bg-white text-gray-500">Or continue with</span>
+                    <span className="px-2 bg-black/30 text-blue-300 backdrop-blur-sm">Or continue with</span>
                   </div>
                 </div>
 
                 <div className="mt-6">
                   <button
                     type="button"
-                    className="w-full flex justify-center py-3 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    className="w-full flex justify-center py-3 px-4 border border-blue-900/50 rounded-lg shadow-sm bg-black/40 text-sm font-medium text-blue-300 hover:bg-blue-900/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300 backdrop-blur-sm"
                   >
                     <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24">
                       <path
@@ -368,21 +504,114 @@ const SignupForm = () => {
 
         {/* Comic-style decorative elements */}
         <div className="absolute -top-6 -right-6 transform rotate-12 z-20 hidden md:block">
-          <div className="bg-yellow-400 text-black font-bold py-2 px-4 rounded-lg shadow-lg border-2 border-black">
+          <div className="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg border-2 border-black shadow-[0_0_10px_rgba(0,191,255,0.5)]">
             POW!
           </div>
         </div>
         <div className="absolute -bottom-6 -left-6 transform -rotate-12 z-20 hidden md:block">
-          <div className="bg-red-500 text-white font-bold py-2 px-4 rounded-lg shadow-lg border-2 border-black">
+          <div className="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg border-2 border-black shadow-[0_0_10px_rgba(0,191,255,0.5)]">
             BOOM!
           </div>
         </div>
       </div>
 
       <style jsx>{`
+        @keyframes star-rotation {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes star-rotation-reverse {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(-360deg); }
+        }
+        
         @keyframes twinkle {
-          0%, 100% { opacity: 0.2; }
-          50% { opacity: 1; }
+          0%, 100% { opacity: 0.5; transform: scale(1); }
+          50% { opacity: 1; transform: scale(1.2); }
+        }
+        
+        .shooting-star {
+          position: absolute;
+          height: 2px;
+          background: linear-gradient(to right, transparent, white, white, transparent);
+          border-radius: 50%;
+          box-shadow: 0 0 5px 1px rgba(0, 191, 255, 0.6);
+          animation: shoot linear forwards;
+        }
+        
+        @keyframes shoot {
+          0% {
+            transform: translateX(0) translateY(0) rotate(inherit);
+            opacity: 1;
+          }
+          70% {
+            opacity: 1;
+          }
+          100% {
+            transform: translateX(400px) translateY(400px) rotate(inherit);
+            opacity: 0;
+          }
+        }
+        
+        .pulsating-star {
+          position: absolute;
+          border-radius: 50%;
+          background-color: white;
+          animation: pulsate 3s infinite ease-in-out;
+        }
+        
+        @keyframes pulsate {
+          0%, 100% { opacity: 0.2; transform: scale(1); box-shadow: 0 0 5px 2px rgba(255, 255, 255, 0.2); }
+          50% { opacity: 1; transform: scale(1.5); box-shadow: 0 0 10px 4px rgba(100, 200, 255, 0.7); }
+        }
+        
+        .glowing-star {
+          position: absolute;
+          border-radius: 50%;
+          background-color: white;
+          animation: glow 4s infinite ease-in-out alternate;
+        }
+        
+        @keyframes glow {
+          0% { transform: scale(0.8); opacity: 0.6; box-shadow: 0 0 5px 2px rgba(255, 255, 255, 0.4); }
+          100% { transform: scale(1.2); opacity: 1; box-shadow: 0 0 15px 5px rgba(100, 200, 255, 0.8); }
+        }
+        
+        .star-cluster-1 {
+          top: 20%;
+          left: 15%;
+          background-image: radial-gradient(white 1px, transparent 1px);
+          background-size: 8px 8px;
+          border-radius: 50%;
+          animation: cluster-drift 60s infinite linear alternate;
+          box-shadow: 0 0 20px 10px rgba(100, 200, 255, 0.2);
+        }
+        
+        .star-cluster-2 {
+          bottom: 30%;
+          right: 20%;
+          background-image: radial-gradient(white 1px, transparent 1px);
+          background-size: 10px 10px;
+          border-radius: 50%;
+          animation: cluster-drift 70s infinite linear alternate-reverse;
+          box-shadow: 0 0 20px 10px rgba(100, 200, 255, 0.2);
+        }
+        
+        @keyframes cluster-drift {
+          0% { transform: translate(0, 0) rotate(0deg); }
+          50% { transform: translate(30px, 20px) rotate(180deg); }
+          100% { transform: translate(-30px, -20px) rotate(360deg); }
+        }
+        
+        @keyframes nebula-pulse {
+          0% { opacity: 0.15; transform: scale(1); }
+          50% { opacity: 0.25; transform: scale(1.1); }
+          100% { opacity: 0.15; transform: scale(1); }
+        }
+        
+        .text-glow-blue {
+          text-shadow: 0 0 5px rgba(0, 191, 255, 0.7);
         }
       `}</style>
     </div>
