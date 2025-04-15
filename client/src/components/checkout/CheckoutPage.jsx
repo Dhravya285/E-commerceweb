@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Link } from "react-router-dom"
 import { ChevronLeft, CreditCard, Truck, Shield, Check } from "lucide-react"
-import Navbar from "../layout/Navbar"
+import Navbar from "../layout/Header"
 import Footer from "../layout/Footer"
 
 // Sample cart data
@@ -637,5 +637,5 @@ const CheckoutPage = () => {
   )
 }
 
-export default CheckoutPage
+export default CheckoutPage;
 

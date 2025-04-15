@@ -89,18 +89,18 @@ const SignupForm = () => {
 
   // Superhero avatars
   const avatars = [
-    { id: 1, name: "Iron Man", image: "/placeholder.svg?height=100&width=100" },
-    { id: 2, name: "Captain America", image: "/placeholder.svg?height=100&width=100" },
-    { id: 3, name: "Black Widow", image: "/placeholder.svg?height=100&width=100" },
-    { id: 4, name: "Spider-Man", image: "/placeholder.svg?height=100&width=100" },
-    { id: 5, name: "Batman", image: "/placeholder.svg?height=100&width=100" },
-    { id: 6, name: "Superman", image: "/placeholder.svg?height=100&width=100" },
-    { id: 7, name: "Wonder Woman", image: "/placeholder.svg?height=100&width=100" },
-    { id: 8, name: "Flash", image: "/placeholder.svg?height=100&width=100" },
-    { id: 9, name: "Naruto", image: "/placeholder.svg?height=100&width=100" },
-    { id: 10, name: "Goku", image: "/placeholder.svg?height=100&width=100" },
-    { id: 11, name: "Luffy", image: "/placeholder.svg?height=100&width=100" },
-    { id: 12, name: "Ichigo", image: "/placeholder.svg?height=100&width=100" },
+    { id: 1, name: "Iron Man", image: "https://tse4.mm.bing.net/th?id=OIP.26uriHoRkXW6Isg0HmfeNwHaE8&pid=Api&P=0&h=180" },
+    { id: 2, name: "Captain America", image: "https://tse1.mm.bing.net/th?id=OIP.94QbVG9_mkAd4k3eN7t_kgHaIq&pid=Api&P=0&h=180" },
+    { id: 3, name: "Black Widow", image: "https://tse2.mm.bing.net/th?id=OIP.FFQl4PIlDkLz1wA-Wd7pCgHaKp&pid=Api&P=0&h=180" },
+    { id: 4, name: "Spider-Man", image: "https://tse4.mm.bing.net/th?id=OIP.02_xra9QDLDvrzOLzrrrHAHaEK&pid=Api&P=0&h=180" },
+    { id: 5, name: "Batman", image: "https://tse1.mm.bing.net/th?id=OIP.vvGX5Ai5-Uc5X1S4_RsJTAHaHw&pid=Api&P=0&h=180" },
+    { id: 6, name: "Superman", image: "https://tse3.mm.bing.net/th?id=OIP.DZlNV5ESVV7XuFPaEg8OvwHaHO&pid=Api&P=0&h=180" },
+    { id: 7, name: "Wonder Woman", image: "https://tse4.mm.bing.net/th?id=OIP.dnusZLslMBVbokkOM6Ew2gHaHx&pid=Api&P=0&h=180" },
+    { id: 8, name: "Flash", image: "https://tse2.mm.bing.net/th?id=OIP.6ws5Fx0-RmS0C8ZbUsR13AHaEK&pid=Api&P=0&h=180" },
+    { id: 9, name: "Naruto", image: "https://tse1.mm.bing.net/th?id=OIP.G2j0dqsHvjAosTu3g_SFGgHaEi&pid=Api&P=0&h=180" },
+    { id: 10, name: "Goku", image: "https://tse1.mm.bing.net/th?id=OIP.MTTN0KUW5YG9GZlf5wY7JwHaHa&pid=Api&P=0&h=180" },
+    { id: 11, name: "Luffy", image: "https://tse4.mm.bing.net/th?id=OIP.sNnzmAowpLuLnfEuk-NReAHaEK&pid=Api&P=0&h=180" },
+    { id: 12, name: "Ichigo", image: "https://tse2.mm.bing.net/th?id=OIP.wimm5qxWNiF6qsr1GIImYgHaHa&pid=Api&P=0&h=180" },
   ]
 
   // Generate glowing stars dynamically

@@ -11,6 +11,8 @@ import ProductListingPage from "./components/product/ProductListingPage";
 import MenPage from "./components/product/Men";
 import WomenPage from "./components/product/Women";
 import AboutPage from "./components/product/About";
+import CheckoutPage from "./components/checkout/CheckoutPage";
+import WishlistPage from "./pages/home/Wishlist";
 
 // Sample product data for ProductDetail
 const sampleProduct = {
@@ -64,6 +66,9 @@ export default function App() {
         <Route path="/men" element={<MenPage />} />
         <Route path="/women" element={<WomenPage/>} />
         <Route path="/about" element={<AboutPage/>} />
+  
+        <Route path="/checkout" element={<CheckoutPage/>} />
+        <Route path="/wishlist" element={<WishlistPage/>} />
       </Routes>
     </Router>
   );

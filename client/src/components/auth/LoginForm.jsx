@@ -50,7 +50,7 @@ const LoginForm = () => {
           }
           
           // Redirect to dashboard or home page
-          navigate("/dashboard")
+          navigate("/profile")
         } else {
           setError("Authentication successful but no token received")
         }

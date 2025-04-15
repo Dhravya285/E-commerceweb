@@ -104,7 +104,7 @@ export default function FeaturedProducts() {
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                activeTab === tab ? "bg-yellow-400 text-indigo-900" : "bg-indigo-800/50 text-white hover:bg-indigo-700"
+                activeTab === tab ? "bg-yellow-400 text-indigo-900" : "bg-indigo-800/50 text-white hover:brightness-110"
               }`}
             >
               {tab}
