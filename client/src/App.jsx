@@ -13,6 +13,8 @@ import WomenPage from "./components/product/Women";
 import AboutPage from "./components/product/About";
 import CheckoutPage from "./components/checkout/CheckoutPage";
 import WishlistPage from "./pages/home/Wishlist";
+// index.js or App.js
+
 
 // Sample product data for ProductDetail
 const sampleProduct = {
