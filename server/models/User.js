@@ -1,3 +1,4 @@
+// User.js
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
@@ -13,17 +14,18 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: function() {
-      return !this.googleId; // Make password required only if googleId is not present
+      return !this.googleId;
     },
   },
   googleId: {
     type: String,
     unique: true,
-    sparse: true, // Allow multiple documents without googleId
+    sparse: true,
   },
   profilePicture: { type: String, default: '' },
+  phone: { type: String, default: '' }, // Add phone field
   bio: { type: String, default: '' },
-  socialLinks: { type: Map, of: String }, // e.g., { linkedin: '', github: '' }
+  socialLinks: { type: Map, of: String },
   isVerified: {
     type: Boolean,
     default: false,
@@ -35,14 +37,22 @@ const userSchema = new mongoose.Schema({
   },
   isGuest: {
     type: Boolean,
-    default: false
+    default: false,
   },
   createdAt: {
     type: Date,
-    default: Date.now
-  }
-  
-  
+    default: Date.now,
+  },
+  addresses: [
+    {
+      type: { type: String },
+      address: String,
+      city: String,
+      state: String,
+      zipCode: String,
+      isDefault: Boolean,
+    },
+  ],
 });
 
 const User = mongoose.model('User', userSchema);

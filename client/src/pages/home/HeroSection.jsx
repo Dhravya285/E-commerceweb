@@ -1,9 +1,8 @@
-"use client"
-
 import { useState } from "react"
+import { Link } from "react-router-dom"
 import ProductCard from "../../components/product/ProductCard"
 
-// Sample product data
+// Sample product data with original image URLs
 const products = [
   {
     id: "1",
@@ -88,11 +87,11 @@ export default function FeaturedProducts() {
   const filteredProducts = activeTab === "All" ? products : products.filter((product) => product.category === activeTab)
 
   return (
-    <section className="py-16">
+    <section className="py-16 bg-slate-900 text-white">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Featured Products</h2>
-          <p className="text-indigo-200 max-w-2xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-purple-300 mb-4">Featured Products</h2>
+          <p className="text-purple-200 max-w-2xl mx-auto">
             Check out our most popular superhero t-shirts featuring iconic characters from your favorite universes
           </p>
         </div>
@@ -104,7 +103,7 @@ export default function FeaturedProducts() {
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                activeTab === tab ? "bg-yellow-400 text-indigo-900" : "bg-indigo-800/50 text-white hover:brightness-110"
+                activeTab === tab ? "bg-yellow-400 text-purple-900" : "bg-purple-800/50 text-purple-200 hover:bg-purple-700/50"
               }`}
             >
               {tab}
@@ -115,11 +114,12 @@ export default function FeaturedProducts() {
         {/* Products grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {filteredProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
+            <Link key={product.id} to={`/products/${product.id}`}>
+              <ProductCard product={product} />
+            </Link>
           ))}
         </div>
       </div>
     </section>
   )
 }
-

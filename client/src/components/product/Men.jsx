@@ -1,51 +1,10 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { ArrowRight, Star } from 'lucide-react'
+import { useState, useEffect } from "react";
+import { ArrowRight, Star } from 'lucide-react';
 import { Link } from "react-router-dom";
+import axios from "axios";
 
-
-// Sample featured products
-const featuredProducts = [
-  {
-    id: 1,
-    name: "Spider-Man: Web Slinger Graphic Tee",
-    price: 799,
-    image: "https://m.media-amazon.com/images/I/B1OGJ8t+8ZS._CLa%7C2140%2C2000%7C91bGKdIRROL.png%7C0%2C0%2C2140%2C2000%2B0.0%2C0.0%2C2140.0%2C2000.0_AC_SX342_SY445_.png",
-    rating: 4.5,
-    category: "Marvel",
-    isNew: true,
-  },
-  {
-    id: 2,
-    name: "Batman: Dark Knight Oversized Tee",
-    price: 899,
-    image: "https://images.bewakoof.com/original/men-s-navy-blue-the-dark-knight-graphic-printed-oversized-t-shirt-592058-1731661124-1.jpg",
-    rating: 5,
-    category: "DC",
-    isNew: false,
-  },
-  {
-    id: 3,
-    name: "Iron Man: Arc Reactor Glow Print",
-    price: 999,
-    image: "https://tse2.mm.bing.net/th?id=OIP.gMTqgQ-XtU97Z_tcDbLXQwHaHa&pid=Api&P=0&h=180",
-    rating: 4,
-    category: "Marvel",
-    isNew: false,
-  },
-  {
-    id: 4,
-    name: "Superman: Man of Steel Acid Wash",
-    price: 1099,
-    image: "https://images-na.ssl-images-amazon.com/images/I/91wEQqCFURL.-BZ1000-.superman-classic-logo-s-t-shirt.jpg",
-    rating: 3.5,
-    category: "DC",
-    isNew: false,
-  },
-]
-
-// Sample categories
 const categories = [
   {
     name: "Graphic Tees",
@@ -67,18 +26,37 @@ const categories = [
     image: "https://tse1.mm.bing.net/th?id=OIP.FxwrviRZ3Acu-y1NJWRRigHaHa&pid=Api&P=0&h=180",
     count: 23,
   },
-]
+];
 
 const MenPage = () => {
-  // Generate glowing stars dynamically
+  const [featuredProducts, setFeaturedProducts] = useState([]);
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:5002/api/products?page=1&limit=4&category=Marvel,DC")
+      .then((response) => {
+        const products = response.data.products.map((p) => ({
+          _id: p._id,
+          name: p.name,
+          price: p.price,
+          image: p.images[0],
+          rating: p.rating,
+          category: p.category,
+          isNew: p.isNew,
+        }));
+        setFeaturedProducts(products);
+      })
+      .catch((error) => console.error("Error fetching products:", error));
+  }, []);
+
   const renderGlowingStars = () => {
-    const stars = []
+    const stars = [];
     for (let i = 0; i < 20; i++) {
-      const size = Math.random() * 3 + 1
-      const top = Math.random() * 100
-      const left = Math.random() * 100
-      const delay = Math.random() * 5
-      const duration = Math.random() * 3 + 2
+      const size = Math.random() * 3 + 1;
+      const top = Math.random() * 100;
+      const left = Math.random() * 100;
+      const delay = Math.random() * 5;
+      const duration = Math.random() * 3 + 2;
       stars.push(
         <div
           key={i}
@@ -92,23 +70,21 @@ const MenPage = () => {
             animationDuration: `${duration}s`,
             animationDelay: `${delay}s`,
           }}
-        />,
-      )
+        />
+      );
     }
-    return stars
-  }
+    return stars;
+  };
 
-  // Generate shooting stars
   const renderShootingStars = () => {
-    const shootingStars = []
+    const shootingStars = [];
     for (let i = 0; i < 5; i++) {
-      const width = Math.random() * 100 + 50
-      const top = Math.random() * 100
-      const left = Math.random() * 50
-      const delay = Math.random() * 15
-      const duration = Math.random() * 2 + 1
-      const angle = Math.random() * 60 - 30
-
+      const width = Math.random() * 100 + 50;
+      const top = Math.random() * 100;
+      const left = Math.random() * 50;
+      const delay = Math.random() * 15;
+      const duration = Math.random() * 2 + 1;
+      const angle = Math.random() * 60 - 30;
       shootingStars.push(
         <div
           key={i}
@@ -120,22 +96,20 @@ const MenPage = () => {
             transform: `rotate(${angle}deg)`,
             animation: `shoot ${duration}s ${delay}s linear infinite`,
           }}
-        />,
-      )
+        />
+      );
     }
-    return shootingStars
-  }
+    return shootingStars;
+  };
 
-  // Generate pulsating stars
   const renderPulsatingStars = () => {
-    const stars = []
+    const stars = [];
     for (let i = 0; i < 15; i++) {
-      const size = Math.random() * 2 + 1
-      const top = Math.random() * 100
-      const left = Math.random() * 100
-      const delay = Math.random() * 5
-      const duration = Math.random() * 3 + 3
-
+      const size = Math.random() * 2 + 1;
+      const top = Math.random() * 100;
+      const left = Math.random() * 100;
+      const delay = Math.random() * 5;
+      const duration = Math.random() * 3 + 3;
       stars.push(
         <div
           key={i}
@@ -149,17 +123,15 @@ const MenPage = () => {
             animationDuration: `${duration}s`,
             animationDelay: `${delay}s`,
           }}
-        />,
-      )
+        />
+      );
     }
-    return stars
-  }
+    return stars;
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-blue-950 relative overflow-hidden">
-      {/* Container for stars */}
       <div id="starry-bg" className="absolute inset-0 overflow-hidden">
-        {/* Enhanced star layers */}
         <div
           className="absolute inset-0"
           style={{
@@ -174,8 +146,6 @@ const MenPage = () => {
             animation: "star-rotation 500s linear infinite",
           }}
         />
-
-        {/* Secondary rotating star layer */}
         <div
           className="absolute inset-0 opacity-60"
           style={{
@@ -188,8 +158,6 @@ const MenPage = () => {
             animation: "star-rotation-reverse 600s linear infinite",
           }}
         />
-
-        {/* Deep space nebula effects */}
         <div
           className="absolute inset-0 opacity-30"
           style={{
@@ -197,17 +165,11 @@ const MenPage = () => {
               "radial-gradient(circle at 70% 20%, rgba(32, 43, 100, 0.4) 0%, transparent 25%), radial-gradient(circle at 30% 70%, rgba(43, 36, 82, 0.4) 0%, transparent 25%)",
           }}
         />
-
-        {/* Animated star clusters */}
         <div className="star-cluster-1 absolute w-32 h-32 opacity-40"></div>
         <div className="star-cluster-2 absolute w-40 h-40 opacity-40 right-0"></div>
-
-        {/* New enhanced glowing stars */}
         {renderGlowingStars()}
         {renderPulsatingStars()}
         {renderShootingStars()}
-
-        {/* Additional nebula glow */}
         <div
           className="absolute top-1/4 left-1/4 w-1/2 h-1/2 rounded-full opacity-20"
           style={{
@@ -216,7 +178,6 @@ const MenPage = () => {
             animation: "nebula-pulse 8s infinite alternate ease-in-out",
           }}
         />
-
         <div
           className="absolute bottom-1/3 right-1/3 w-1/3 h-1/3 rounded-full opacity-15"
           style={{
@@ -228,7 +189,6 @@ const MenPage = () => {
       </div>
 
       <div className="container mx-auto px-4 py-8 relative z-10">
-        {/* Hero Section */}
         <div className="relative rounded-2xl overflow-hidden mb-12">
           <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent z-10"></div>
           <img
@@ -255,7 +215,6 @@ const MenPage = () => {
           </div>
         </div>
 
-        {/* Featured Categories */}
         <div className="mb-16">
           <h2
             className="text-3xl font-bold text-white mb-8 text-center"
@@ -294,7 +253,6 @@ const MenPage = () => {
           </div>
         </div>
 
-        {/* Featured Products */}
         <div className="mb-16">
           <div className="flex justify-between items-center mb-8">
             <h2
@@ -313,11 +271,10 @@ const MenPage = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {featuredProducts.map((product) => (
               <div
-                key={product.id}
+                key={product._id}
                 className="group relative rounded-xl overflow-hidden transform transition-all duration-300 hover:scale-105"
               >
                 <div className="bg-black/40 backdrop-blur-md border border-blue-900/50 rounded-xl overflow-hidden shadow-[0_0_15px_rgba(0,191,255,0.3)]">
-                  {/* Product Image */}
                   <div className="relative aspect-[3/4] overflow-hidden">
                     <img
                       src={product.image || "/placeholder.svg"}
@@ -325,8 +282,6 @@ const MenPage = () => {
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    
-                    {/* Badges */}
                     {product.isNew && (
                       <div className="absolute top-2 left-2">
                         <span className="bg-blue-500/70 text-white text-xs font-bold px-2 py-1 rounded-md backdrop-blur-sm">
@@ -335,12 +290,8 @@ const MenPage = () => {
                       </div>
                     )}
                   </div>
-
-                  {/* Product Info */}
                   <div className="p-4">
                     <h3 className="text-blue-300 font-medium text-sm mb-1 line-clamp-2">{product.name}</h3>
-
-                    {/* Rating */}
                     <div className="flex items-center mb-2">
                       <div className="flex items-center">
                         {[...Array(5)].map((_, i) => (
@@ -354,12 +305,10 @@ const MenPage = () => {
                       </div>
                       <span className="text-blue-300 text-xs ml-1">{product.rating}</span>
                     </div>
-
-                    {/* Price */}
                     <div className="flex items-center justify-between">
                       <span className="text-blue-300 font-bold">₹{product.price}</span>
                       <Link
-                        to={`/product/${product.id}`}
+                        to={`/product/${product._id}`}
                         className="text-blue-400 text-sm hover:text-blue-300"
                       >
                         View Details
@@ -372,7 +321,6 @@ const MenPage = () => {
           </div>
         </div>
 
-        {/* Promotional Banner */}
         <div className="relative rounded-2xl overflow-hidden mb-16">
           <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent z-10"></div>
           <img
@@ -405,17 +353,10 @@ const MenPage = () => {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
         }
-        
         @keyframes star-rotation-reverse {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(-360deg); }
         }
-        
-        @keyframes twinkle {
-          0%, 100% { opacity: 0.5; transform: scale(1); }
-          50% { opacity: 1; transform: scale(1.2); }
-        }
-        
         .shooting-star {
           position: absolute;
           height: 2px;
@@ -424,7 +365,6 @@ const MenPage = () => {
           box-shadow: 0 0 5px 1px rgba(0, 191, 255, 0.6);
           animation: shoot linear forwards;
         }
-        
         @keyframes shoot {
           0% {
             transform: translateX(0) translateY(0) rotate(inherit);
@@ -438,31 +378,26 @@ const MenPage = () => {
             opacity: 0;
           }
         }
-        
         .pulsating-star {
           position: absolute;
           border-radius: 50%;
           background-color: white;
           animation: pulsate 3s infinite ease-in-out;
         }
-        
         @keyframes pulsate {
           0%, 100% { opacity: 0.2; transform: scale(1); box-shadow: 0 0 5px 2px rgba(255, 255, 255, 0.2); }
           50% { opacity: 1; transform: scale(1.5); box-shadow: 0 0 10px 4px rgba(100, 200, 255, 0.7); }
         }
-        
         .glowing-star {
           position: absolute;
           border-radius: 50%;
           background-color: white;
           animation: glow 4s infinite ease-in-out alternate;
         }
-        
         @keyframes glow {
           0% { transform: scale(0.8); opacity: 0.6; box-shadow: 0 0 5px 2px rgba(255, 255, 255, 0.4); }
           100% { transform: scale(1.2); opacity: 1; box-shadow: 0 0 15px 5px rgba(100, 200, 255, 0.8); }
         }
-        
         .star-cluster-1 {
           top: 20%;
           left: 15%;
@@ -472,7 +407,6 @@ const MenPage = () => {
           animation: cluster-drift 60s infinite linear alternate;
           box-shadow: 0 0 20px 10px rgba(100, 200, 255, 0.2);
         }
-        
         .star-cluster-2 {
           bottom: 30%;
           right: 20%;
@@ -482,13 +416,11 @@ const MenPage = () => {
           animation: cluster-drift 70s infinite linear alternate-reverse;
           box-shadow: 0 0 20px 10px rgba(100, 200, 255, 0.2);
         }
-        
         @keyframes cluster-drift {
           0% { transform: translate(0, 0) rotate(0deg); }
           50% { transform: translate(30px, 20px) rotate(180deg); }
           100% { transform: translate(-30px, -20px) rotate(360deg); }
         }
-        
         @keyframes nebula-pulse {
           0% { opacity: 0.15; transform: scale(1); }
           50% { opacity: 0.25; transform: scale(1.1); }
@@ -496,7 +428,7 @@ const MenPage = () => {
         }
       `}</style>
     </div>
-  )
-}
+  );
+};
 
-export default MenPage
+export default MenPage;

@@ -1,163 +1,62 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Filter, ChevronDown, ChevronUp, X } from 'lucide-react'
-import ProductCard from "./ProductCard"
-
-// Sample products data
-const sampleProducts = [
-  {
-    id: 1,
-    name: "Spider-Man: Web Slinger Graphic Tee",
-    price: 799,
-    image: "https://m.media-amazon.com/images/I/B1OGJ8t+8ZS._CLa%7C2140%2C2000%7C91bGKdIRROL.png%7C0%2C0%2C2140%2C2000%2B0.0%2C0.0%2C2140.0%2C2000.0_AC_SX342_SY445_.png",
-    rating: 4.5,
-    category: "Marvel",
-    subcategory: "Graphic Printed",
-    isNew: true,
-    discount: 0,
-  },
-  {
-    id: 2,
-    name: "Batman: Dark Knight Oversized Tee",
-    price: 899,
-    image: "https://images.bewakoof.com/original/men-s-navy-blue-the-dark-knight-graphic-printed-oversized-t-shirt-592058-1731661124-1.jpg",
-    rating: 5,
-    category: "DC",
-    subcategory: "Oversized",
-    isNew: false,
-    discount: 15,
-  },
-  {
-    id: 3,
-    name: "Iron Man: Arc Reactor Glow Print",
-    price: 999,
-    image: "https://tse2.mm.bing.net/th?id=OIP.gMTqgQ-XtU97Z_tcDbLXQwHaHa&pid=Api&P=0&h=180",
-    rating: 4,
-    category: "MARVEL",
-    subcategory: "Graphic Printed",
-    isNew: false,
-    discount: 0,
-  },
-  {
-    id: 4,
-    name: "Naruto: Nine-Tails Mode Graphic Tee",
-    price: 849,
-    image: "https://tse2.mm.bing.net/th?id=OIP.gMTqgQ-XtU97Z_tcDbLXQwHaHa&pid=Api&P=0&h=180",
-    rating: 4.5,
-    category: "ANIME",
-    subcategory: "Graphic Printed",
-    isNew: true,
-    discount: 10,
-  },
-  {
-    id: 5,
-    name: "Superman: Man of Steel Acid Wash",
-    price: 1099,
-    image: "https://images-na.ssl-images-amazon.com/images/I/91wEQqCFURL.-BZ1000-.superman-classic-logo-s-t-shirt.jpg",
-    rating: 3.5,
-    category: "DC",
-    subcategory: "Acid Wash",
-    isNew: false,
-    discount: 0,
-  },
-  {
-    id: 6,
-    name: "Deadpool: Chimichangas Oversized Tee",
-    price: 899,
-    image: "https://www.redwolf.in/image/cache/catalog/t-shirts/oversized/deadpool-merc-with-a-mouth-oversized-t-shirt-mock-back-600x800.jpg?m=1728472094",
-    rating: 5,
-    category: "MARVEL",
-    subcategory: "Oversized",
-    isNew: true,
-    discount: 0,
-  },
-  {
-    id: 7,
-    name: "One Punch Man: Saitama Graphic Tee",
-    price: 799,
-    image: "https://cdn.media.amplience.net/s/hottopic/20107884_hi?$productMainDesktop$",
-    rating: 4,
-    category: "ANIME",
-    subcategory: "Graphic Printed",
-    isNew: false,
-    discount: 20,
-  },
-  {
-    id: 8,
-    name: "Wonder Woman: Amazonian Warrior Tee",
-    price: 849,
-    image: "https://mmv2api.s3.us-east-2.amazonaws.com/products/thumbs/2-image-tswwprdamaz-3-productimagenowatermark.jpg",
-    rating: 4.5,
-    category: "DC",
-    subcategory: "Graphic Printed",
-    isNew: false,
-    discount: 0,
-  },
-  {
-    id: 9,
-    name: "Thor: Mjolnir Graphic Tee",
-    price: 849,
-    image: "https://cdn03.ciceksepeti.com/cicek/kcm76329998-1/L/thor-mjolnir-dijital-resimli-baski-hammer-siyah-tshirt-kcm76329998-1-192292648dd2491eb176dd0d3e5cf933.jpg",
-    rating: 4.5,
-    category: "Marvel",
-    subcategory: "Graphic Printed",
-    isNew: false,
-    discount: 0,
-  },
-  {
-    id: 10,
-    name: "Demon Slayer: Tanjiro Graphic Tee",
-    price: 899,
-    image: "https://tse3.mm.bing.net/th?id=OIP.iosKPeA_9nl04nrXi8vnpgHaIJ&pid=Api&P=0&h=180",
-    rating: 4.5,
-    category: "Anime" ,
-    subcategory: "Graphic Printed",
-    isNew: true,
-    discount: 0,
-  },
-  {
-    id: 11,
-    name: "Flash: Speedster Oversized Tee",
-    price: 849,
-    image: "https://tse4.mm.bing.net/th?id=OIP.ILcmxECqd5j2epD98MSOIAHaJ4&pid=Api&P=0&h=180",
-    rating: 4,
-    category: "DC ",
-    subcategory: "Oversized",
-    isNew: false,
-    discount: 10,
-  },
-  {
-    id: 12,
-    name: "Black Panther: Wakanda Forever Tee",
-    price: 899,
-    image: "https://mmv2api.s3.us-east-2.amazonaws.com/products/images/2-image-tsbpmtchalla-1-productimagenowatermark.jpg",
-    rating: 5,
-    category: "Marvel",
-    subcategory: "Graphic Printed",
-    isNew: false,
-    discount: 0,
-  },
-]
+import { useState, useEffect } from "react";
+import { Filter, ChevronDown, ChevronUp, X } from "lucide-react";
+import ProductCard from "./ProductCard";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 const ProductListingPage = () => {
+  const [products, setProducts] = useState([]);
   const [filters, setFilters] = useState({
     categories: [],
     subcategories: [],
     priceRange: [0, 2000],
     onSale: false,
     newArrivals: false,
-  })
-  const [sortBy, setSortBy] = useState("featured")
+  });
+  const [sortBy, setSortBy] = useState("featured");
   const [expandedFilters, setExpandedFilters] = useState({
     categories: true,
     subcategories: true,
     price: true,
-  })
-  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false)
+  });
+  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [productsPerPage] = useState(9);
+  const [totalProducts, setTotalProducts] = useState(0);
+  const [showAll, setShowAll] = useState(false);
 
-  // Filter categories
-  const categories = ["Marvel", "DC", "Anime", "Custom"]
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await axios.get("http://localhost:5002/api/products", {
+          params: showAll ? {} : { page: currentPage, limit: productsPerPage },
+        });
+        console.log("Raw API Response:", response.data);
+        const fetchedProducts = response.data.products.map((p) => ({
+          ...p,
+          id: p._id,
+          title: p.name,
+        }));
+        setProducts(fetchedProducts);
+        setTotalProducts(response.data.total || fetchedProducts.length);
+        console.log("Mapped Products:", fetchedProducts);
+        console.log("Total Products Set:", response.data.total || fetchedProducts.length);
+      } catch (error) {
+        console.error("Fetch Error:", error.response?.data || error.message);
+        toast.error("Failed to load products");
+      }
+    };
+    fetchProducts();
+  }, [currentPage, productsPerPage, showAll]);
+
+  useEffect(() => {
+    console.log("Current Filters:", filters);
+    console.log("Displayed Products After Filtering:", filteredProducts.length);
+  }, [filters, products]);
+
+  const categories = ["Marvel", "DC", "Anime", "Custom"];
   const subcategories = [
     "Graphic Printed",
     "Oversized",
@@ -166,32 +65,28 @@ const ProductListingPage = () => {
     "Sleeveless",
     "Long Sleeve",
     "Hooded",
-  ]
+  ];
 
   const toggleFilter = (filterType, value) => {
     setFilters((prev) => {
-      const currentFilters = [...prev[filterType]]
-      const index = currentFilters.indexOf(value)
-
+      const currentFilters = [...prev[filterType]];
+      const index = currentFilters.indexOf(value);
       if (index === -1) {
-        currentFilters.push(value)
+        currentFilters.push(value);
       } else {
-        currentFilters.splice(index, 1)
+        currentFilters.splice(index, 1);
       }
-
-      return {
-        ...prev,
-        [filterType]: currentFilters,
-      }
-    })
-  }
+      return { ...prev, [filterType]: currentFilters };
+    });
+    setCurrentPage(1);
+  };
 
   const toggleExpandFilter = (filterType) => {
     setExpandedFilters((prev) => ({
       ...prev,
       [filterType]: !prev[filterType],
-    }))
-  }
+    }));
+  };
 
   const clearFilters = () => {
     setFilters({
@@ -200,56 +95,71 @@ const ProductListingPage = () => {
       priceRange: [0, 2000],
       onSale: false,
       newArrivals: false,
-    })
-  }
+    });
+    setCurrentPage(1);
+  };
 
-  // Apply filters to products
-  const filteredProducts = sampleProducts.filter((product) => {
-    // Category filter
-    if (filters.categories.length > 0 && !filters.categories.includes(product.category)) {
-      return false
-    }
+  const filteredProducts = products.filter((product) => {
+    if (filters.categories.length > 0 && !filters.categories.includes(product.category)) return false;
+    if (filters.subcategories.length > 0 && !filters.subcategories.includes(product.subcategory)) return false;
+    if (product.price < filters.priceRange[0] || product.price > filters.priceRange[1]) return false;
+    if (filters.onSale && !product.originalPrice) return false;
+    if (filters.newArrivals && !product.isNew) return false;
+    return true;
+  });
 
-    // Subcategory filter
-    if (filters.subcategories.length > 0 && !filters.subcategories.includes(product.subcategory)) {
-      return false
-    }
-
-    // Price range filter
-    if (product.price < filters.priceRange[0] || product.price > filters.priceRange[1]) {
-      return false
-    }
-
-    // On sale filter
-    if (filters.onSale && product.discount === 0) {
-      return false
-    }
-
-    // New arrivals filter
-    if (filters.newArrivals && !product.isNew) {
-      return false
-    }
-
-    return true
-  })
-
-  // Sort products
   const sortedProducts = [...filteredProducts].sort((a, b) => {
     switch (sortBy) {
       case "price-low-high":
-        return a.price - b.price
+        return a.price - b.price;
       case "price-high-low":
-        return b.price - a.price
+        return b.price - a.price;
       case "rating":
-        return b.rating - a.rating
+        return b.rating - a.rating;
       case "newest":
-        return b.isNew ? -1 : a.isNew ? 1 : 0
-      default: // featured
-        return 0
+        return b.isNew ? -1 : a.isNew ? 1 : 0;
+      default:
+        return 0;
     }
-  })
+  });
 
-  // Generate glowing stars dynamically
+  const totalPages = Math.ceil(totalProducts / productsPerPage);
+
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
+  const renderPageNumbers = () => {
+    const pageNumbers = [];
+    const maxPagesToShow = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
+    let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+
+    if (endPage - startPage + 1 < maxPagesToShow) {
+      startPage = Math.max(1, endPage - maxPagesToShow + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pageNumbers.push(
+        <button
+          key={i}
+          onClick={() => handlePageChange(i)}
+          className={`px-3 py-1 border-t border-b border-blue-900/50 text-sm font-medium ${
+            currentPage === i
+              ? "bg-blue-900/50 text-blue-300"
+              : "text-blue-300 hover:bg-blue-900/30"
+          }`}
+        >
+          {i}
+        </button>
+      );
+    }
+    return pageNumbers;
+  };
+
   const renderGlowingStars = () => {
     const stars = [];
     for (let i = 0; i < 20; i++) {
@@ -259,17 +169,17 @@ const ProductListingPage = () => {
       const delay = Math.random() * 5;
       const duration = Math.random() * 3 + 2;
       stars.push(
-        <div 
+        <div
           key={i}
-          className="glowing-star" 
+          className="glowing-star"
           style={{
             width: `${size}px`,
             height: `${size}px`,
             top: `${top}%`,
             left: `${left}%`,
-            boxShadow: `0 0 ${size * 2}px ${size/2}px rgba(255, 255, 255, 0.8)`,
+            boxShadow: `0 0 ${size * 2}px ${size / 2}px rgba(255, 255, 255, 0.8)`,
             animationDuration: `${duration}s`,
-            animationDelay: `${delay}s`
+            animationDelay: `${delay}s`,
           }}
         />
       );
@@ -277,7 +187,6 @@ const ProductListingPage = () => {
     return stars;
   };
 
-  // Generate shooting stars
   const renderShootingStars = () => {
     const shootingStars = [];
     for (let i = 0; i < 5; i++) {
@@ -287,17 +196,16 @@ const ProductListingPage = () => {
       const delay = Math.random() * 15;
       const duration = Math.random() * 2 + 1;
       const angle = Math.random() * 60 - 30;
-      
       shootingStars.push(
-        <div 
+        <div
           key={i}
-          className="shooting-star" 
+          className="shooting-star"
           style={{
             width: `${width}px`,
             top: `${top}%`,
             left: `${left}%`,
             transform: `rotate(${angle}deg)`,
-            animation: `shoot ${duration}s ${delay}s linear infinite`
+            animation: `shoot ${duration}s ${delay}s linear infinite`,
           }}
         />
       );
@@ -305,7 +213,6 @@ const ProductListingPage = () => {
     return shootingStars;
   };
 
-  // Generate pulsating stars
   const renderPulsatingStars = () => {
     const stars = [];
     for (let i = 0; i < 15; i++) {
@@ -314,11 +221,10 @@ const ProductListingPage = () => {
       const left = Math.random() * 100;
       const delay = Math.random() * 5;
       const duration = Math.random() * 3 + 3;
-      
       stars.push(
-        <div 
+        <div
           key={i}
-          className="pulsating-star" 
+          className="pulsating-star"
           style={{
             width: `${size}px`,
             height: `${size}px`,
@@ -326,7 +232,7 @@ const ProductListingPage = () => {
             left: `${left}%`,
             boxShadow: `0 0 ${size * 3}px ${size}px rgba(100, 200, 255, 0.8)`,
             animationDuration: `${duration}s`,
-            animationDelay: `${delay}s`
+            animationDelay: `${delay}s`,
           }}
         />
       );
@@ -336,9 +242,7 @@ const ProductListingPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-blue-950 relative overflow-hidden">
-      {/* Container for stars */}
       <div id="starry-bg" className="absolute inset-0 overflow-hidden">
-        {/* Enhanced star layers */}
         <div
           className="absolute inset-0"
           style={{
@@ -350,11 +254,9 @@ const ProductListingPage = () => {
               radial-gradient(2.5px 2.5px at 80% 20%, rgba(255, 255, 255, 0.7) 1%, transparent 1%)
             `,
             backgroundSize: "200px 200px, 150px 150px, 100px 100px, 250px 250px, 300px 300px",
-            animation: "star-rotation 500s linear infinite"
+            animation: "star-rotation 500s linear infinite",
           }}
         />
-        
-        {/* Secondary rotating star layer */}
         <div
           className="absolute inset-0 opacity-60"
           style={{
@@ -364,54 +266,50 @@ const ProductListingPage = () => {
               radial-gradient(1px 1px at 30% 80%, white 1%, transparent 1%)
             `,
             backgroundSize: "250px 250px, 300px 300px, 350px 350px",
-            animation: "star-rotation-reverse 600s linear infinite"
+            animation: "star-rotation-reverse 600s linear infinite",
           }}
         />
-        
-        {/* Deep space nebula effects */}
-        <div className="absolute inset-0 opacity-30" 
+        <div
+          className="absolute inset-0 opacity-30"
           style={{
-            background: "radial-gradient(circle at 70% 20%, rgba(32, 43, 100, 0.4) 0%, transparent 25%), radial-gradient(circle at 30% 70%, rgba(43, 36, 82, 0.4) 0%, transparent 25%)"
+            background:
+              "radial-gradient(circle at 70% 20%, rgba(32, 43, 100, 0.4) 0%, transparent 25%), radial-gradient(circle at 30% 70%, rgba(43, 36, 82, 0.4) 0%, transparent 25%)",
           }}
         />
-        
-        {/* Animated star clusters */}
         <div className="star-cluster-1 absolute w-32 h-32 opacity-40"></div>
         <div className="star-cluster-2 absolute w-40 h-40 opacity-40 right-0"></div>
-        
-        {/* New enhanced glowing stars */}
         {renderGlowingStars()}
         {renderPulsatingStars()}
         {renderShootingStars()}
-        
-        {/* Additional nebula glow */}
-        <div className="absolute top-1/4 left-1/4 w-1/2 h-1/2 rounded-full opacity-20"
+        <div
+          className="absolute top-1/4 left-1/4 w-1/2 h-1/2 rounded-full opacity-20"
           style={{
             background: "radial-gradient(circle, rgba(0, 150, 255, 0.3) 0%, transparent 70%)",
             filter: "blur(40px)",
-            animation: "nebula-pulse 8s infinite alternate ease-in-out"
+            animation: "nebula-pulse 8s infinite alternate ease-in-out",
           }}
         />
-        
-        <div className="absolute bottom-1/3 right-1/3 w-1/3 h-1/3 rounded-full opacity-15"
+        <div
+          className="absolute bottom-1/3 right-1/3 w-1/3 h-1/3 rounded-full opacity-15"
           style={{
             background: "radial-gradient(circle, rgba(100, 0, 255, 0.2) 0%, transparent 70%)",
             filter: "blur(30px)",
-            animation: "nebula-pulse 12s infinite alternate-reverse ease-in-out"
+            animation: "nebula-pulse 12s infinite alternate-reverse ease-in-out",
           }}
         />
       </div>
 
       <div className="container mx-auto px-4 py-8 relative z-10">
-        {/* Page Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2 text-center" style={{textShadow: "0 0 10px rgba(100, 200, 255, 0.7)"}}>
+          <h1
+            className="text-3xl font-bold text-white mb-2 text-center"
+            style={{ textShadow: "0 0 10px rgba(100, 200, 255, 0.7)" }}
+          >
             Comic T-Shirts Collection
           </h1>
-          <p className="text-blue-300 text-center">{sortedProducts.length} products found</p>
+          <p className="text-blue-300 text-center">{sortedProducts.length} of {totalProducts} products</p>
         </div>
 
-        {/* Mobile Filter Button */}
         <div className="md:hidden mb-4">
           <button
             onClick={() => setIsMobileFilterOpen(true)}
@@ -423,18 +321,21 @@ const ProductListingPage = () => {
         </div>
 
         <div className="flex flex-col md:flex-row gap-8">
-          {/* Sidebar Filters - Desktop */}
           <div className="hidden md:block w-64 flex-shrink-0">
             <div className="sticky top-4">
               <div className="bg-black/40 backdrop-blur-md rounded-xl p-6 border border-blue-900/50 shadow-[0_0_15px_rgba(0,191,255,0.3)]">
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-lg font-bold text-blue-300" style={{textShadow: "0 0 5px rgba(0, 191, 255, 0.7)"}}>Filters</h2>
+                  <h2
+                    className="text-lg font-bold text-blue-300"
+                    style={{ textShadow: "0 0 5px rgba(0, 191, 255, 0.7)" }}
+                  >
+                    Filters
+                  </h2>
                   <button onClick={clearFilters} className="text-sm text-blue-400 hover:text-blue-300">
                     Clear all
                   </button>
                 </div>
 
-                {/* Categories Filter */}
                 <div className="mb-6 border-b border-blue-900/30 pb-6">
                   <button
                     onClick={() => toggleExpandFilter("categories")}
@@ -443,7 +344,6 @@ const ProductListingPage = () => {
                     <span>Categories</span>
                     {expandedFilters.categories ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                   </button>
-
                   {expandedFilters.categories && (
                     <div className="space-y-2">
                       {categories.map((cat) => (
@@ -464,7 +364,6 @@ const ProductListingPage = () => {
                   )}
                 </div>
 
-                {/* Subcategories Filter */}
                 <div className="mb-6 border-b border-blue-900/30 pb-6">
                   <button
                     onClick={() => toggleExpandFilter("subcategories")}
@@ -473,7 +372,6 @@ const ProductListingPage = () => {
                     <span>T-Shirt Types</span>
                     {expandedFilters.subcategories ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                   </button>
-
                   {expandedFilters.subcategories && (
                     <div className="space-y-2">
                       {subcategories.map((subcat) => (
@@ -494,7 +392,6 @@ const ProductListingPage = () => {
                   )}
                 </div>
 
-                {/* Price Range Filter */}
                 <div className="mb-6 border-b border-blue-900/30 pb-6">
                   <button
                     onClick={() => toggleExpandFilter("price")}
@@ -503,7 +400,6 @@ const ProductListingPage = () => {
                     <span>Price Range</span>
                     {expandedFilters.price ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                   </button>
-
                   {expandedFilters.price && (
                     <div>
                       <div className="flex items-center justify-between mb-2">
@@ -528,7 +424,6 @@ const ProductListingPage = () => {
                   )}
                 </div>
 
-                {/* Additional Filters */}
                 <div>
                   <h3 className="font-medium text-blue-300 mb-3">Additional Filters</h3>
                   <div className="space-y-2">
@@ -562,7 +457,6 @@ const ProductListingPage = () => {
             </div>
           </div>
 
-          {/* Mobile Filter Sidebar */}
           {isMobileFilterOpen && (
             <div className="fixed inset-0 z-50 overflow-hidden">
               <div
@@ -573,7 +467,12 @@ const ProductListingPage = () => {
                 <div className="relative w-screen max-w-md">
                   <div className="h-full flex flex-col bg-gradient-to-b from-gray-900 to-blue-950 shadow-xl overflow-y-scroll">
                     <div className="flex items-center justify-between px-4 py-3 border-b border-blue-900/30">
-                      <h2 className="text-lg font-medium text-blue-300" style={{textShadow: "0 0 5px rgba(0, 191, 255, 0.7)"}}>Filters</h2>
+                      <h2
+                        className="text-lg font-medium text-blue-300"
+                        style={{ textShadow: "0 0 5px rgba(0, 191, 255, 0.7)" }}
+                      >
+                        Filters
+                      </h2>
                       <button
                         type="button"
                         className="text-blue-400 hover:text-blue-300"
@@ -583,7 +482,6 @@ const ProductListingPage = () => {
                       </button>
                     </div>
                     <div className="p-4">
-                      {/* Sort By */}
                       <div className="mb-6 border-b border-blue-900/30 pb-6">
                         <h3 className="font-medium text-blue-300 mb-3">Sort By</h3>
                         <select
@@ -599,7 +497,6 @@ const ProductListingPage = () => {
                         </select>
                       </div>
 
-                      {/* Categories Filter */}
                       <div className="mb-6 border-b border-blue-900/30 pb-6">
                         <h3 className="font-medium text-blue-300 mb-3">Categories</h3>
                         <div className="space-y-2">
@@ -620,7 +517,6 @@ const ProductListingPage = () => {
                         </div>
                       </div>
 
-                      {/* Subcategories Filter */}
                       <div className="mb-6 border-b border-blue-900/30 pb-6">
                         <h3 className="font-medium text-blue-300 mb-3">T-Shirt Types</h3>
                         <div className="space-y-2">
@@ -641,7 +537,6 @@ const ProductListingPage = () => {
                         </div>
                       </div>
 
-                      {/* Additional Filters */}
                       <div className="mb-6 border-b border-blue-900/30 pb-6">
                         <h3 className="font-medium text-blue-300 mb-3">Additional Filters</h3>
                         <div className="space-y-2">
@@ -693,30 +588,36 @@ const ProductListingPage = () => {
             </div>
           )}
 
-          {/* Product Grid */}
           <div className="flex-1">
-            {/* Sort and Results Count - Desktop */}
-            <div className="hidden md:flex justify-between items-center mb-6">
+            <div className="flex justify-between items-center mb-6">
               <p className="text-sm text-blue-300">
-                Showing <span className="font-medium">{sortedProducts.length}</span> results
+                Showing <span className="font-medium">{sortedProducts.length}</span> of{" "}
+                <span className="font-medium">{totalProducts}</span> results
               </p>
-              <div className="flex items-center">
-                <span className="text-sm text-blue-300 mr-2">Sort by:</span>
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="py-1 px-2 border border-blue-900/50 bg-black/30 text-blue-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm backdrop-blur-sm"
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={() => setShowAll(!showAll)}
+                  className="text-sm text-blue-400 hover:text-blue-300"
                 >
-                  <option value="featured">Featured</option>
-                  <option value="price-low-high">Price: Low to High</option>
-                  <option value="price-high-low">Price: High to Low</option>
-                  <option value="rating">Highest Rated</option>
-                  <option value="newest">Newest First</option>
-                </select>
+                  {showAll ? "Show Paginated" : "Show All"}
+                </button>
+                <div className="flex items-center">
+                  <span className="text-sm text-blue-300 mr-2">Sort by:</span>
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="py-1 px-2 border border-blue-900/50 bg-black/30 text-blue-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm backdrop-blur-sm"
+                  >
+                    <option value="featured">Featured</option>
+                    <option value="price-low-high">Price: Low to High</option>
+                    <option value="price-high-low">Price: High to Low</option>
+                    <option value="rating">Highest Rated</option>
+                    <option value="newest">Newest First</option>
+                  </select>
+                </div>
               </div>
             </div>
 
-            {/* Active Filters */}
             {(filters.categories.length > 0 ||
               filters.subcategories.length > 0 ||
               filters.onSale ||
@@ -762,7 +663,6 @@ const ProductListingPage = () => {
               </div>
             )}
 
-            {/* Products */}
             {sortedProducts.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {sortedProducts.map((product) => (
@@ -782,23 +682,26 @@ const ProductListingPage = () => {
               </div>
             )}
 
-            {/* Pagination */}
-            {sortedProducts.length > 0 && (
+            {sortedProducts.length > 0 && !showAll && (
               <div className="mt-8 flex justify-center">
                 <nav className="flex items-center">
-                  <button className="px-2 py-1 border border-blue-900/50 rounded-l-md text-sm font-medium text-blue-300 hover:bg-blue-900/30 backdrop-blur-sm">
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className={`px-2 py-1 border border-blue-900/50 rounded-l-md text-sm font-medium text-blue-300 ${
+                      currentPage === 1_1 ? "opacity-50 cursor-not-allowed" : "hover:bg-blue-900/30"
+                    }`}
+                  >
                     Previous
                   </button>
-                  <button className="px-3 py-1 border-t border-b border-blue-900/50 text-sm font-medium text-blue-300 bg-blue-900/50">
-                    1
-                  </button>
-                  <button className="px-3 py-1 border-t border-b border-blue-900/50 text-sm font-medium text-blue-300 hover:bg-blue-900/30 backdrop-blur-sm">
-                    2
-                  </button>
-                  <button className="px-3 py-1 border-t border-b border-blue-900/50 text-sm font-medium text-blue-300 hover:bg-blue-900/30 backdrop-blur-sm">
-                    3
-                  </button>
-                  <button className="px-2 py-1 border border-blue-900/50 rounded-r-md text-sm font-medium text-blue-300 hover:bg-blue-900/30 backdrop-blur-sm">
+                  {renderPageNumbers()}
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className={`px-2 py-1 border border-blue-900/50 rounded-r-md text-sm font-medium text-blue-300 ${
+                      currentPage === totalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-blue-900/30"
+                    }`}
+                  >
                     Next
                   </button>
                 </nav>
@@ -813,17 +716,14 @@ const ProductListingPage = () => {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
         }
-        
         @keyframes star-rotation-reverse {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(-360deg); }
         }
-        
         @keyframes twinkle {
           0%, 100% { opacity: 0.5; transform: scale(1); }
           50% { opacity: 1; transform: scale(1.2); }
         }
-        
         .shooting-star {
           position: absolute;
           height: 2px;
@@ -832,7 +732,6 @@ const ProductListingPage = () => {
           box-shadow: 0 0 5px 1px rgba(0, 191, 255, 0.6);
           animation: shoot linear forwards;
         }
-        
         @keyframes shoot {
           0% {
             transform: translateX(0) translateY(0) rotate(inherit);
@@ -846,31 +745,26 @@ const ProductListingPage = () => {
             opacity: 0;
           }
         }
-        
         .pulsating-star {
           position: absolute;
           border-radius: 50%;
           background-color: white;
           animation: pulsate 3s infinite ease-in-out;
         }
-        
         @keyframes pulsate {
           0%, 100% { opacity: 0.2; transform: scale(1); box-shadow: 0 0 5px 2px rgba(255, 255, 255, 0.2); }
           50% { opacity: 1; transform: scale(1.5); box-shadow: 0 0 10px 4px rgba(100, 200, 255, 0.7); }
         }
-        
         .glowing-star {
           position: absolute;
           border-radius: 50%;
           background-color: white;
           animation: glow 4s infinite ease-in-out alternate;
         }
-        
         @keyframes glow {
           0% { transform: scale(0.8); opacity: 0.6; box-shadow: 0 0 5px 2px rgba(255, 255, 255, 0.4); }
           100% { transform: scale(1.2); opacity: 1; box-shadow: 0 0 15px 5px rgba(100, 200, 255, 0.8); }
         }
-        
         .star-cluster-1 {
           top: 20%;
           left: 15%;
@@ -880,7 +774,6 @@ const ProductListingPage = () => {
           animation: cluster-drift 60s infinite linear alternate;
           box-shadow: 0 0 20px 10px rgba(100, 200, 255, 0.2);
         }
-        
         .star-cluster-2 {
           bottom: 30%;
           right: 20%;
@@ -890,13 +783,11 @@ const ProductListingPage = () => {
           animation: cluster-drift 70s infinite linear alternate-reverse;
           box-shadow: 0 0 20px 10px rgba(100, 200, 255, 0.2);
         }
-        
         @keyframes cluster-drift {
           0% { transform: translate(0, 0) rotate(0deg); }
           50% { transform: translate(30px, 20px) rotate(180deg); }
           100% { transform: translate(-30px, -20px) rotate(360deg); }
         }
-        
         @keyframes nebula-pulse {
           0% { opacity: 0.15; transform: scale(1); }
           50% { opacity: 0.25; transform: scale(1.1); }
@@ -904,7 +795,7 @@ const ProductListingPage = () => {
         }
       `}</style>
     </div>
-  )
-}
+  );
+};
 
-export default ProductListingPage
+export default ProductListingPage;

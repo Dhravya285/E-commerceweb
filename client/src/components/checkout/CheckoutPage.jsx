@@ -1,18 +1,16 @@
-"use client"
-
 import { useState } from "react"
 import { Link } from "react-router-dom"
 import { ChevronLeft, CreditCard, Truck, Shield, Check, Star, Moon } from "lucide-react"
 import Navbar from "../layout/Header"
 import Footer from "../layout/Footer"
 
-// Sample cart data
+// Sample cart data with Cloudinary URLs
 const cartItems = [
   {
     id: 1,
     name: "Spider-Man: Web Slinger Graphic Tee",
     price: 799,
-    image: "/placeholder.svg?height=100&width=100",
+    image: "https://res.cloudinary.com/your-cloud-name/image/upload/ecommerce/products/spiderman/spiderman-tshirt.jpg",
     size: "L",
     color: "Red",
     quantity: 1,
@@ -21,7 +19,7 @@ const cartItems = [
     id: 2,
     name: "Batman: Dark Knight Oversized Tee",
     price: 899,
-    image: "/placeholder.svg?height=100&width=100",
+    image: "https://res.cloudinary.com/your-cloud-name/image/upload/ecommerce/products/batman/batman-tshirt.jpg",
     size: "M",
     color: "Black",
     quantity: 2,
@@ -30,7 +28,7 @@ const cartItems = [
     id: 6,
     name: "Deadpool: Chimichangas Oversized Tee",
     price: 899,
-    image: "/placeholder.svg?height=100&width=100",
+    image: "https://res.cloudinary.com/your-cloud-name/image/upload/ecommerce/products/deadpool/deadpool-tshirt.jpg",
     size: "XL",
     color: "Red",
     quantity: 1,
@@ -87,7 +85,7 @@ const CheckoutPage = () => {
   return (
     <>
       <Navbar />
-      <div className="bg-slate-900 text-white bg-[url('/starry-background.svg')] bg-fixed bg-cover">
+      <div className="bg-slate-900 text-white bg-[url('/starry-background.svg')] bg-fixed bg-cover min-h-screen">
         <div className="container mx-auto px-4 py-8">
           <div className="mb-8">
             <Link to="/cart" className="inline-flex items-center text-purple-400 hover:text-purple-300">
@@ -99,7 +97,7 @@ const CheckoutPage = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-2">
-              <div className="bg-slate-800 rounded-lg shadow-lg border border-purple-500/30 p-6 mb-6 backdrop-blur-sm relative overflow-hidden">
+              <div className="bg-slate-800/80 rounded-lg shadow-lg border border-purple-500/30 p-6 mb-6 backdrop-blur-sm relative overflow-hidden">
                 {/* Starry accents */}
                 <div className="absolute top-2 left-2">
                   <Star size={12} className="text-yellow-300 opacity-70" />
@@ -179,7 +177,7 @@ const CheckoutPage = () => {
                           value={formData.firstName}
                           onChange={handleChange}
                           required
-                          className="w-full px-3 py-2 bg-slate-700 border border-purple-500/50 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 text-white"
+                          className="w-full px-3 py-2 bg-slate-700/50 border border-purple-500/50 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 text-white"
                         />
                       </div>
                       <div>
@@ -193,7 +191,7 @@ const CheckoutPage = () => {
                           value={formData.lastName}
                           onChange={handleChange}
                           required
-                          className="w-full px-3 py-2 bg-slate-700 border border-purple-500/50 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 text-white"
+                          className="w-full px-3 py-2 bg-slate-700/50 border border-purple-500/50 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 text-white"
                         />
                       </div>
                     </div>
@@ -210,7 +208,7 @@ const CheckoutPage = () => {
                           value={formData.email}
                           onChange={handleChange}
                           required
-                          className="w-full px-3 py-2 bg-slate-700 border border-purple-500/50 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 text-white"
+                          className="w-full px-3 py-2 bg-slate-700/50 border border-purple-500/50 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 text-white"
                         />
                       </div>
                       <div>
@@ -224,7 +222,7 @@ const CheckoutPage = () => {
                           value={formData.phone}
                           onChange={handleChange}
                           required
-                          className="w-full px-3 py-2 bg-slate-700 border border-purple-500/50 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 text-white"
+                          className="w-full px-3 py-2 bg-slate-700/50 border border-purple-500/50 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 text-white"
                         />
                       </div>
                     </div>
@@ -240,7 +238,7 @@ const CheckoutPage = () => {
                         value={formData.address}
                         onChange={handleChange}
                         required
-                        className="w-full px-3 py-2 bg-slate-700 border border-purple-500/50 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 text-white"
+                        className="w-full px-3 py-2 bg-slate-700/50 border border-purple-500/50 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 text-white"
                       />
                     </div>
 
@@ -256,7 +254,7 @@ const CheckoutPage = () => {
                           value={formData.city}
                           onChange={handleChange}
                           required
-                          className="w-full px-3 py-2 bg-slate-700 border border-purple-500/50 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 text-white"
+                          className="w-full px-3 py-2 bg-slate-700/50 border border-purple-500/50 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 text-white"
                         />
                       </div>
                       <div>
@@ -270,7 +268,7 @@ const CheckoutPage = () => {
                           value={formData.state}
                           onChange={handleChange}
                           required
-                          className="w-full px-3 py-2 bg-slate-700 border border-purple-500/50 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 text-white"
+                          className="w-full px-3 py-2 bg-slate-700/50 border border-purple-500/50 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 text-white"
                         />
                       </div>
                       <div>
@@ -284,7 +282,7 @@ const CheckoutPage = () => {
                           value={formData.zipCode}
                           onChange={handleChange}
                           required
-                          className="w-full px-3 py-2 bg-slate-700 border border-purple-500/50 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 text-white"
+                          className="w-full px-3 py-2 bg-slate-700/50 border border-purple-500/50 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 text-white"
                         />
                       </div>
                     </div>
@@ -292,7 +290,7 @@ const CheckoutPage = () => {
                     <div className="mb-6">
                       <h3 className="text-lg font-medium mb-3 text-purple-300">Shipping Method</h3>
                       <div className="space-y-3">
-                        <div className="flex items-center p-3 rounded-lg bg-slate-700/50 border border-purple-500/30">
+                        <div className="flex items-center p-3 rounded-lg bg-slate-700/30 border border-purple-500/30">
                           <input
                             id="shipping-standard"
                             name="shippingMethod"
@@ -308,7 +306,7 @@ const CheckoutPage = () => {
                             </span>
                           </label>
                         </div>
-                        <div className="flex items-center p-3 rounded-lg bg-slate-700/50 border border-purple-500/30">
+                        <div className="flex items-center p-3 rounded-lg bg-slate-700/30 border border-purple-500/30">
                           <input
                             id="shipping-express"
                             name="shippingMethod"
@@ -344,7 +342,7 @@ const CheckoutPage = () => {
 
                     <div className="mb-6">
                       <div className="space-y-3">
-                        <div className="flex items-center p-3 rounded-lg bg-slate-700/50 border border-purple-500/30">
+                        <div className="flex items-center p-3 rounded-lg bg-slate-700/30 border border-purple-500/30">
                           <input
                             id="payment-card"
                             name="paymentMethod"
@@ -362,7 +360,7 @@ const CheckoutPage = () => {
                             </div>
                           </label>
                         </div>
-                        <div className="flex items-center p-3 rounded-lg bg-slate-700/50 border border-purple-500/30">
+                        <div className="flex items-center p-3 rounded-lg bg-slate-700/30 border border-purple-500/30">
                           <input
                             id="payment-upi"
                             name="paymentMethod"
@@ -375,7 +373,7 @@ const CheckoutPage = () => {
                             <span className="text-sm font-medium text-purple-200">UPI</span>
                           </label>
                         </div>
-                        <div className="flex items-center p-3 rounded-lg bg-slate-700/50 border border-purple-500/30">
+                        <div className="flex items-center p-3 rounded-lg bg-slate-700/30 border border-purple-500/30">
                           <input
                             id="payment-cod"
                             name="paymentMethod"
@@ -404,7 +402,7 @@ const CheckoutPage = () => {
                             value={formData.cardName}
                             onChange={handleChange}
                             required
-                            className="w-full px-3 py-2 bg-slate-800 border border-purple-500/50 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 text-white"
+                            className="w-full px-3 py-2 bg-slate-800/50 border border-purple-500/50 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 text-white"
                           />
                         </div>
                         <div className="mb-4">
@@ -419,7 +417,7 @@ const CheckoutPage = () => {
                             onChange={handleChange}
                             required
                             placeholder="XXXX XXXX XXXX XXXX"
-                            className="w-full px-3 py-2 bg-slate-800 border border-purple-500/50 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 text-white"
+                            className="w-full px-3 py-2 bg-slate-800/50 border border-purple-500/50 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 text-white"
                           />
                         </div>
                         <div className="grid grid-cols-2 gap-4">
@@ -435,7 +433,7 @@ const CheckoutPage = () => {
                               onChange={handleChange}
                               required
                               placeholder="MM/YY"
-                              className="w-full px-3 py-2 bg-slate-800 border border-purple-500/50 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 text-white"
+                              className="w-full px-3 py-2 bg-slate-800/50 border border-purple-500/50 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 text-white"
                             />
                           </div>
                           <div>
@@ -450,7 +448,7 @@ const CheckoutPage = () => {
                               onChange={handleChange}
                               required
                               placeholder="XXX"
-                              className="w-full px-3 py-2 bg-slate-800 border border-purple-500/50 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 text-white"
+                              className="w-full px-3 py-2 bg-slate-800/50 border border-purple-500/50 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 text-white"
                             />
                           </div>
                         </div>
@@ -530,7 +528,7 @@ const CheckoutPage = () => {
                           <div key={item.id} className="flex items-center py-2 border-b border-slate-600 last:border-0">
                             <div className="w-16 h-16 flex-shrink-0 bg-slate-600 rounded-md overflow-hidden">
                               <img
-                                src={item.image || "/placeholder.svg"}
+                                src={item.image || "https://res.cloudinary.com/your-cloud-name/image/upload/ecommerce/products/default/default-tshirt.jpg"}
                                 alt={item.name}
                                 className="w-full h-full object-center object-cover"
                               />
@@ -573,7 +571,7 @@ const CheckoutPage = () => {
 
             {/* Order Summary */}
             <div className="lg:col-span-1">
-              <div className="bg-slate-800 rounded-lg p-6 border border-purple-500/30 sticky top-4 backdrop-blur-sm shadow-lg relative overflow-hidden">
+              <div className="bg-slate-800/80 rounded-lg p-6 border border-purple-500/30 sticky top-4 backdrop-blur-sm shadow-lg relative overflow-hidden">
                 {/* Starry accents */}
                 <div className="absolute top-4 right-4">
                   <Star size={12} className="text-yellow-300 opacity-70" />
@@ -635,7 +633,8 @@ const CheckoutPage = () => {
                         {shippingMethod === "express"
                           ? "Express Shipping (1-2 business days)"
                           : "Standard Shipping (4-6 business days)"}
-                      </p></div>
+                      </p>
+                    </div>
                   </div>
                   <div className="flex items-start bg-slate-700/40 p-3 rounded-lg border border-purple-500/20">
                     <CreditCard className="text-purple-400 mt-0.5 flex-shrink-0 mr-3" size={18} />

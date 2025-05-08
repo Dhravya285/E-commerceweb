@@ -1,7 +1,8 @@
+
 "use client"
 
 import { useState } from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { Mail, Lock, User, Eye, EyeOff, UserPlus, ArrowRight } from "lucide-react"
 
 const SignupForm = () => {
@@ -17,10 +18,8 @@ const SignupForm = () => {
   const [selectedAvatar, setSelectedAvatar] = useState(null)
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
+  const navigate = useNavigate()
 
-  // Animation effect hook would go here in a real implementation
-  // We'll include it in the JSX and style sections instead
- 
   const handleChange = (e) => {
     const { name, value } = e.target
     setFormData((prev) => ({
@@ -56,25 +55,30 @@ const SignupForm = () => {
       
       setLoading(true);
       try {
+        const selectedAvatarData = avatars.find((avatar) => avatar.id === selectedAvatar);
+        const payload = {
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+          profilePicture: selectedAvatarData.image, // Send the image URL
+          authProvider: 'local',
+        };
+        console.log("Sending signup data:", payload); // Debug log
+
         const response = await fetch("http://localhost:5002/api/auth/signup", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            name: formData.name,
-            email: formData.email,
-            password: formData.password,
-            profilePicture: selectedAvatar.toString(),
-            authProvider: 'local'
-          }),
+          body: JSON.stringify(payload),
         });
-  
+
         const data = await response.json();
-  
+
         if (response.ok) {
+          localStorage.setItem("token", data.token);
           console.log("Signup successful:", data);
-          window.location.href = "/login";
+          navigate("/profile"); // Redirect to profile
         } else {
           setError(data.message || "Something went wrong during signup");
         }
@@ -190,9 +194,7 @@ const SignupForm = () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-gray-900 to-blue-950 relative overflow-hidden">
-      {/* Container for stars */}
       <div id="starry-signup-bg" className="absolute inset-0 overflow-hidden">
-        {/* Enhanced star layers */}
         <div
           className="absolute inset-0"
           style={{
@@ -207,8 +209,6 @@ const SignupForm = () => {
             animation: "star-rotation 500s linear infinite"
           }}
         />
-        
-        {/* Secondary rotating star layer */}
         <div
           className="absolute inset-0 opacity-60"
           style={{
@@ -221,24 +221,16 @@ const SignupForm = () => {
             animation: "star-rotation-reverse 600s linear infinite"
           }}
         />
-        
-        {/* Deep space nebula effects */}
         <div className="absolute inset-0 opacity-30" 
           style={{
             background: "radial-gradient(circle at 70% 20%, rgba(32, 43, 100, 0.4) 0%, transparent 25%), radial-gradient(circle at 30% 70%, rgba(43, 36, 82, 0.4) 0%, transparent 25%)"
           }}
         />
-        
-        {/* Animated star clusters */}
         <div className="star-cluster-1 absolute w-32 h-32 opacity-40"></div>
         <div className="star-cluster-2 absolute w-40 h-40 opacity-40 right-0"></div>
-        
-        {/* New enhanced glowing stars */}
         {renderGlowingStars()}
         {renderPulsatingStars()}
         {renderShootingStars()}
-        
-        {/* Additional nebula glow */}
         <div className="absolute top-1/4 left-1/4 w-1/2 h-1/2 rounded-full opacity-20"
           style={{
             background: "radial-gradient(circle, rgba(0, 150, 255, 0.3) 0%, transparent 70%)",
@@ -246,7 +238,6 @@ const SignupForm = () => {
             animation: "nebula-pulse 8s infinite alternate ease-in-out"
           }}
         />
-        
         <div className="absolute bottom-1/3 right-1/3 w-1/3 h-1/3 rounded-full opacity-15"
           style={{
             background: "radial-gradient(circle, rgba(100, 0, 255, 0.2) 0%, transparent 70%)",
@@ -278,7 +269,6 @@ const SignupForm = () => {
             <form onSubmit={handleSubmit}>
               {step === 1 ? (
                 <>
-                  {/* Step 1: Basic Information */}
                   <div className="rounded-md shadow-sm -space-y-px mb-6">
                     <div className="mb-4">
                       <label htmlFor="name" className="block text-sm font-medium text-blue-300 mb-1 text-glow-blue">
@@ -401,7 +391,6 @@ const SignupForm = () => {
                 </>
               ) : (
                 <>
-                  {/* Step 2: Avatar Selection */}
                   <div className="mb-6">
                     <p className="text-sm text-blue-300 mb-4">
                       Choose a superhero avatar that represents you. This will be displayed on your profile and reviews.
@@ -459,7 +448,6 @@ const SignupForm = () => {
               </p>
             </div>
 
-            {/* Social Sign Up */}
             {step === 1 && (
               <div className="mt-6">
                 <div className="relative">
@@ -502,7 +490,6 @@ const SignupForm = () => {
           </div>
         </div>
 
-        {/* Comic-style decorative elements */}
         <div className="absolute -top-6 -right-6 transform rotate-12 z-20 hidden md:block">
           <div className="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg border-2 border-black shadow-[0_0_10px_rgba(0,191,255,0.5)]">
             POW!
@@ -618,4 +605,4 @@ const SignupForm = () => {
   )
 }
 
-export default SignupForm
+export default SignupForm;

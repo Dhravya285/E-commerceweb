@@ -1,43 +1,71 @@
 const dotenv = require("dotenv");
-const express = require('express');
-const authRoutes = require('./routes/auth');
-const googleRoutes = require('./routes/google');
-const cors = require('cors');
-const connectDB = require('./config/db');
-const helmet = require('helmet')
-const authMiddleware = require('./middleware/authenticateToken')
+const express = require("express");
+const authRoutes = require("./routes/auth");
+const googleRoutes = require("./routes/google");
+const userRoutes = require("./routes/userRoutes");
+const orderRoutes = require("./routes/orderRoutes");
+const wishlistRoutes = require("./routes/WishlistRoutes");
+const productRoutes = require('./routes/productRoutes');
+const cors = require("cors");
+const connectDB = require("./config/db");
+const helmet = require("helmet");
+const path = require("path");
+
 dotenv.config();
+
 const app = express();
+
+// Middleware
 app.use(express.json());
+app.use("/uploads", express.static(path.join(__dirname, "Uploads")));
+
+// CORS configuration
 const corsOptions = {
-    origin: 'http://localhost:5173', // Your frontend's origin (React app)
-    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed HTTP methods
-    credentials: true, // Allow cookies and credentials to be sent with requests
-  };
+  origin: "http://localhost:5173",
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true,
+};
+app.use(cors(corsOptions));
 
-  app.use(helmet());
-
-// Set a more lenient CSP that allows favicon.ico and other resources
+// Helmet security middleware
+app.use(helmet());
 app.use(
   helmet.contentSecurityPolicy({
     directives: {
-      defaultSrc: ["'self'"],  // Allow the page itself to load resources
-      imgSrc: ["'self'", "http://localhost:5002"],  // Allow images from the same origin and backend
-      connectSrc: ["'self'", "http://localhost:5002"],  // Allow backend connections
-      scriptSrc: ["'self'"],  // Allow scripts from the same origin
-      styleSrc: ["'self'", "'unsafe-inline'"],  // Allow styles from the same origin and inline styles
-      fontSrc: ["'self'"],  // Allow fonts from the same origin
+      defaultSrc: ["'self'"],
+      imgSrc: ["'self'", "http://localhost:5002", "http://localhost:5173", "data:"],
+      connectSrc: ["'self'", "http://localhost:5002", "http://localhost:5173"],
+      scriptSrc: ["'self'", "'unsafe-inline'"], // Allow inline scripts for frontend
+      styleSrc: ["'self'", "'unsafe-inline'"], // Allow inline styles
+      fontSrc: ["'self'"],
     },
   })
 );
-app.use(cors(corsOptions));
+
 // Connect to MongoDB
 connectDB();
 
 // Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/google', googleRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/google", googleRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/orders", orderRoutes);
+app.use("/api/wishlist", wishlistRoutes);
+app.use('/api/products', productRoutes);
+
+// Global error handling middleware
+app.use((err, req, res, next) => {
+  console.error("Server Error:", err.stack);
+  res.status(err.status || 500).json({
+    message: err.message || "Something went wrong!",
+    error: process.env.NODE_ENV === "development" ? err.stack : undefined,
+  });
+});
+
+// Handle unmatched routes
+app.use((req, res) => {
+  res.status(404).json({ message: "Route not found" });
+});
+
 const PORT = process.env.PORT || 5002;
-
-
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
