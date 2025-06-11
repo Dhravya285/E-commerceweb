@@ -1,13 +1,13 @@
-// userController.js
 const User = require('../models/User');
-const asyncHandler = require('express-async-handler'); // For error handling
-const multer = require('multer'); // For handling file uploads
+const Order = require('../models/Order');
+const asyncHandler = require('express-async-handler');
+const multer = require('multer');
 const path = require('path');
 
 // Configure Multer for avatar uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/avatars/'); // Ensure this folder exists
+    cb(null, 'uploads/avatars/');
   },
   filename: (req, file, cb) => {
     cb(null, `${req.user.id}-${Date.now()}${path.extname(file.originalname)}`);
@@ -78,8 +78,8 @@ const handleAvatarUpload = asyncHandler(async (req, res) => {
     throw new Error('No file uploaded');
   }
 
-  // Save the file path or URL (adjust based on your setup)
-  user.profilePicture = `/uploads/avatars/${req.file.filename}`;
+  // Save the file path or URL
+  user.profilePicture = `/Uploads/avatars/${req.file.filename}`;
   await user.save();
 
   res.json({ profilePicture: user.profilePicture });
@@ -143,7 +143,7 @@ const updateAddress = asyncHandler(async (req, res) => {
 });
 
 // Delete address
-const deleteAddress = asyncHandler(async  (req, res) => {
+const deleteAddress = asyncHandler(async (req, res) => {
   const { addressId } = req.params;
 
   const user = await User.findById(req.user.id);
@@ -163,11 +163,58 @@ const deleteAddress = asyncHandler(async  (req, res) => {
   res.json({ addresses: user.addresses });
 });
 
+// Get all customers (for admin)
+const getAllCustomers = asyncHandler(async (req, res) => {
+  try {
+    if (!req.user.isAdmin) {
+      console.log(`Access denied for user ${req.user._id}: Not an admin`);
+      return res.status(403).json({ error: 'Access denied. Admin privileges required.' });
+    }
+
+    // Fetch non-admin users
+    const users = await User.find({ role: { $ne: 'admin' } }).select('_id name email');
+
+    // Aggregate order count and total spent for each user
+    const customerData = await Promise.all(
+      users.map(async (user) => {
+        const orders = await Order.aggregate([
+          { $match: { 'user.userId': user._id, paymentStatus: 'completed' } },
+          {
+            $group: {
+              _id: null,
+              orderCount: { $sum: 1 },
+              totalSpent: { $sum: '$total' },
+            },
+          },
+        ]);
+
+        return {
+          id: user._id.toString(),
+          name: user.name,
+          email: user.email,
+          orders: orders[0]?.orderCount || 0,
+          totalSpent: orders[0]?.totalSpent || 0,
+        };
+      })
+    );
+
+    console.log(`Fetched ${customerData.length} customers for admin ${req.user._id}`);
+    res.status(200).json(customerData);
+  } catch (error) {
+    console.error('Error fetching customers:', {
+      message: error.message,
+      stack: error.stack,
+    });
+    res.status(500).json({ error: 'Failed to fetch customers', details: error.message });
+  }
+});
+
 module.exports = {
   getUserProfile,
   updateUserProfile,
-  uploadAvatar: [uploadAvatar, handleAvatarUpload], // Combine Multer middleware with handler
+  uploadAvatar: [uploadAvatar, handleAvatarUpload],
   addAddress,
   updateAddress,
   deleteAddress,
+  getAllCustomers,
 };

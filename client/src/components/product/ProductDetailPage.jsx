@@ -1,40 +1,47 @@
+
+
 import { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
-import {
-  Heart,
-  ShoppingCart,
-  Share2,
-  Star,
-  Truck,
-  RotateCcw,
-  Shield,
-  ChevronDown,
-  ChevronUp,
-  Plus,
-  Minus,
-} from "lucide-react";
-import Navbar from "../layout/Header";
-import Footer from "../layout/Footer";
-import RelatedProducts from "./RelatedProducts";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
+import {
+  Heart, ShoppingCart, Star, ChevronLeft, ChevronRight,
+  Minus, Plus, Share2, Truck, RotateCcw, Shield,
+  ChevronUp, ChevronDown
+} from "lucide-react";
+import Header from "../layout/Header";
+import Footer from "../layout/Footer";
 
 const ProductDetailPage = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [product, setProduct] = useState(null);
   const [mainImage, setMainImage] = useState("");
-  const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
+  const [quantity, setQuantity] = useState(1);
+  const [expandedSection, setExpandedSection] = useState(null);
   const [isFavorite, setIsFavorite] = useState(false);
-  const [expandedSection, setExpandedSection] = useState("description");
+  const [wishlistItemId, setWishlistItemId] = useState(null);
   const [error, setError] = useState(null);
+  const [reviews, setReviews] = useState([]);
+  const [newReview, setNewReview] = useState({ rating: 0, comment: "" });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    const fetchProduct = async () => {
+    const fetchProductWishlistAndReviews = async () => {
+      if (!id || id === "undefined" || !/^[0-9a-fA-F]{24}$/.test(id)) {
+        setError("Invalid product ID");
+        toast.error("Invalid product ID");
+        navigate("/products");
+        return;
+      }
+
       try {
-        const response = await axios.get(`http://localhost:5002/api/products/${id}`);
-        const productData = response.data;
+        // Fetch product
+        const productResponse = await axios.get(`http://localhost:5002/api/products/${id}`);
+        console.log("Fetched Product Data:", productResponse.data);
+        const productData = productResponse.data;
         const formattedProduct = {
           ...productData,
           id: productData._id,
@@ -43,9 +50,10 @@ const ProductDetailPage = () => {
           originalPrice: productData.originalPrice || null,
           description: productData.description || "",
           longDescription: productData.longDescription || "",
-          images: productData.images?.length > 0 ? productData.images : ["/placeholder.svg"],
+          images: productData.images?.length > 0 ? productData.images.map(img => img.url) : ["/placeholder.svg"],
           category: productData.category || "Unknown",
           subcategory: productData.subcategory || "",
+          gender: productData.gender || "Unisex",
           rating: productData.rating || 0,
           reviewCount: productData.reviewCount || 0,
           inStock: productData.inStock ?? true,
@@ -53,76 +61,284 @@ const ProductDetailPage = () => {
           colors: productData.colors?.length > 0 ? productData.colors : [],
           features: productData.features?.length > 0 ? productData.features : [],
         };
+        console.log("Formatted Product:", formattedProduct);
         setProduct(formattedProduct);
-        setMainImage(formattedProduct.images[0]);
+        setMainImage(formattedProduct.images[0] || "/placeholder.svg");
         setSelectedSize(formattedProduct.sizes[0] || "");
         setSelectedColor(formattedProduct.colors[0]?.name || "");
 
-        // Check if product is in wishlist
-        const wishlist = JSON.parse(localStorage.getItem("wishlist") || "[]");
-        console.log("Wishlist on load:", wishlist);
-        console.log("Checking if product ID", formattedProduct.id, "is in wishlist");
-        setIsFavorite(wishlist.some((item) => item.id === formattedProduct.id));
+        // Fetch reviews
+        const reviewsResponse = await axios.get(`http://localhost:5002/api/reviews/product/${id}`);
+        console.log("Fetched Reviews Data:", reviewsResponse.data);
+        setReviews(reviewsResponse.data.reviews || []);
+
+        // Fetch wishlist
+        const token = localStorage.getItem("token");
+        let userId = null;
+        if (token) {
+          try {
+            const payload = token.split(".")[1];
+            if (!payload) throw new Error("Invalid token: Missing payload");
+            const decoded = JSON.parse(atob(payload));
+            console.log("Fetch Product Token Payload:", decoded);
+            userId = decoded.id || decoded._id || decoded.sub;
+            console.log("Fetch Product userId:", userId || "undefined");
+            if (!userId) {
+              console.warn("No userId found in token payload");
+            }
+          } catch (e) {
+            console.error("Token decode error:", e.message);
+          }
+        }
+
+        if (userId && token) {
+          const wishlistResponse = await axios.get("http://localhost:5002/api/wishlist", {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          console.log("Wishlist API Response:", {
+            status: wishlistResponse.status,
+            headers: wishlistResponse.headers,
+            data: wishlistResponse.data,
+          });
+          const wishlistData = Array.isArray(wishlistResponse.data)
+            ? wishlistResponse.data
+            : Array.isArray(wishlistResponse.data.wishlist)
+            ? wishlistResponse.data.wishlist
+            : [];
+          console.log("Wishlist Data:", wishlistData);
+          const wishlistItem = wishlistData.find((item) => item.productId?._id === formattedProduct.id);
+          setIsFavorite(!!wishlistItem);
+          setWishlistItemId(wishlistItem?._id || null);
+        } else {
+          const localWishlist = JSON.parse(localStorage.getItem("wishlist") || "[]");
+          setIsFavorite(localWishlist.some((item) => item.id === formattedProduct.id));
+        }
       } catch (error) {
+        console.error("Error fetching product, wishlist, or reviews:", {
+          message: error.message,
+          response: error.response ? {
+            status: error.response.status,
+            data: error.response.data,
+            headers: error.response.headers,
+          } : null,
+        });
         setError(error.response?.data?.message || "Failed to load product details");
         toast.error(error.response?.data?.message || "Failed to load product details");
+        navigate("/products");
       }
     };
-    fetchProduct();
-  }, [id]);
+    fetchProductWishlistAndReviews();
+  }, [id, navigate]);
 
   const incrementQuantity = () => setQuantity((prev) => prev + 1);
   const decrementQuantity = () => setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
 
-  const toggleSection = (section) =>
+  const toggleSection = (section) => {
     setExpandedSection(expandedSection === section ? null : section);
+  };
 
-  const handleAddToWishlist = () => {
+  const handleAddToWishlist = async () => {
     if (!product) {
-      console.error("No product data available");
       toast.error("Cannot add to wishlist: Product not loaded");
       return;
     }
 
-    console.log("Handling wishlist for product ID:", product.id);
-    const wishlist = JSON.parse(localStorage.getItem("wishlist") || "[]");
-    console.log("Current wishlist:", wishlist);
+    const token = localStorage.getItem("token");
+    let userId = null;
+    if (token) {
+      try {
+        const payload = token.split(".")[1];
+        if (!payload) throw new Error("Invalid token: Missing payload");
+        const decoded = JSON.parse(atob(payload));
+        console.log("Add to Wishlist Token Payload:", decoded);
+        userId = decoded.id || decoded._id || decoded.sub;
+        console.log("Add to Wishlist userId:", userId || "undefined");
+        if (!userId) {
+          console.warn("No userId found in token payload");
+        }
+      } catch (e) {
+        console.error("Token decode error:", e.message);
+      }
+    }
 
-    if (isFavorite) {
-      // Remove from wishlist
-      const updatedWishlist = wishlist.filter((item) => item.id !== product.id);
-      localStorage.setItem("wishlist", JSON.stringify(updatedWishlist));
-      setIsFavorite(false);
-      toast.success("Removed from wishlist");
-      console.log("Removed product", product.id, "from wishlist. New wishlist:", updatedWishlist);
-    } else {
-      // Add to wishlist
-      const wishlistItem = {
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        image: product.images[0],
-        category: product.category,
-      };
-      const updatedWishlist = [...wishlist, wishlistItem];
-      localStorage.setItem("wishlist", JSON.stringify(updatedWishlist));
-      setIsFavorite(true);
-      toast.success("Added to wishlist");
-      console.log("Added product", product.id, "to wishlist. New wishlist:", updatedWishlist);
+    try {
+      if (userId && token) {
+        if (isFavorite) {
+          await axios.delete(`http://localhost:5002/api/wishlist/${wishlistItemId}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          setIsFavorite(false);
+          setWishlistItemId(null);
+          toast.success("Removed from wishlist");
+          window.dispatchEvent(new Event("wishlistUpdated"));
+        } else {
+          const response = await axios.post(
+            "http://localhost:5002/api/wishlist",
+            { productId: product.id },
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          console.log("POST Wishlist Response:", response.data);
+          setIsFavorite(true);
+          setWishlistItemId(response.data._id);
+          toast.success("Added to wishlist");
+          window.dispatchEvent(new Event("wishlistUpdated"));
+        }
+      } else {
+        let localWishlist = JSON.parse(localStorage.getItem("wishlist") || "[]");
+        if (isFavorite) {
+          localWishlist = localWishlist.filter((item) => item.id !== product.id);
+          localStorage.setItem("wishlist", JSON.stringify(localWishlist));
+          setIsFavorite(false);
+          toast.success("Removed from wishlist");
+        } else {
+          const wishlistItem = {
+            id: product.id,
+            name: product.name,
+            price: product.price,
+            image: product.images[0],
+            category: product.category,
+          };
+          localWishlist.push(wishlistItem);
+          localStorage.setItem("wishlist", JSON.stringify(localWishlist));
+          setIsFavorite(true);
+          toast.success("Added to wishlist");
+        }
+      }
+    } catch (error) {
+      console.error("Wishlist error:", {
+        message: error.message,
+        response: error.response ? {
+          status: error.response.status,
+          data: error.response.data,
+          headers: error.response.headers,
+        } : null,
+      });
+      toast.error(error.response?.data?.message || "Failed to update wishlist");
     }
   };
 
-  const handleAddToCart = () => {
-    if (!selectedSize) {
-      toast.error("Please select a size");
+ const handleAddToCart = async () => {
+  if (!product?.inStock) {
+    toast.error('Product is out of stock');
+    return;
+  }
+  if (!selectedSize) {
+    toast.error('Please select a size');
+    return;
+  }
+
+  try {
+    let userId = localStorage.getItem('userId');
+    const token = localStorage.getItem('token');
+
+    console.log('Add to Cart - userId:', userId || 'undefined');
+    console.log('Add to Cart - token:', token ? token.substring(0, 10) + '...' : 'missing');
+
+    // Fallback: Decode userId from token
+    if (!userId && token) {
+      try {
+        const payload = token.split('.')[1];
+        if (!payload) throw new Error('Invalid token: Missing payload');
+        const decoded = JSON.parse(atob(payload));
+        console.log('Add to Cart - Token Payload:', decoded);
+        userId = decoded._id || decoded.id || decoded.sub;
+        console.log('Add to Cart - Decoded userId:', userId || 'undefined');
+        if (userId) {
+          localStorage.setItem('userId', userId);
+        } else {
+          throw new Error('No userId in token payload');
+        }
+      } catch (e) {
+        console.error('Token decode error:', e.message);
+        toast.error('Invalid session. Please log in again.');
+        navigate('/login');
+        return;
+      }
+    }
+
+    if (!userId || !token) {
+      toast.error('Please log in to add to cart');
+      navigate('/login');
       return;
     }
-    if (!selectedColor) {
-      toast.error("Please select a color");
+
+    const cartItem = {
+      userId,
+      productId: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.images[0] || '/placeholder.png',
+      size: selectedSize,
+      color: selectedColor || 'Default',
+      quantity,
+    };
+
+    console.log('Add to Cart - Sending request:', { cartItem, headers: { Authorization: `Bearer ${token}` } });
+    const response = await axios.post(
+      'http://localhost:5002/api/cart/add', // Updated endpoint
+      cartItem,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    console.log('Add to Cart - Response:', response.data);
+    toast.success(`${product.name} added to cart!`);
+  } catch (error) {
+    console.error('Cart error:', {
+      message: error.message,
+      response: error.response ? {
+        status: error.response.status,
+        data: error.response.data,
+      } : null,
+    });
+    toast.error(error.response?.data?.message || 'Failed to add to cart');
+  }
+};
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+    if (!newReview.rating || !newReview.comment) {
+      toast.error("Please provide a rating and comment");
       return;
     }
-    toast.success(`Added ${quantity} ${product.name} to cart`);
-    // Implement cart logic here (e.g., update context or local storage)
+    setIsSubmitting(true);
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.post(
+        "http://localhost:5002/api/reviews",
+        {
+          productId: id,
+          rating: newReview.rating,
+          comment: newReview.comment,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log("Review Submission Response:", response.data);
+      setReviews([...reviews, response.data.review]);
+      setNewReview({ rating: 0, comment: "" });
+      setProduct({
+        ...product,
+        rating: response.data.newProductRating,
+        reviewCount: product.reviewCount + 1,
+      });
+      toast.success("Review submitted successfully");
+    } catch (error) {
+      console.error("Error submitting review:", {
+        message: error.message,
+        response: error.response ? {
+          status: error.response.status,
+          data: error.response.data,
+        } : null,
+      });
+      toast.error(error.response?.data?.message || "Failed to submit review");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleRatingChange = (rating) => {
+    setNewReview({ ...newReview, rating });
   };
 
   const discount = product?.originalPrice
@@ -209,12 +425,13 @@ const ProductDetailPage = () => {
     return stars;
   };
 
-  if (error) {
+    if (error) {
+    console.log("Rendering Error State:", error);
     return (
       <div className="min-h-screen bg-gradient-to-b from-gray-900 to-blue-950 flex items-center justify-center relative overflow-hidden">
         <div className="text-center">
-          <p className="text-red-400 mb-4">{error}</p>
-          <Link to="/shop" className="text-blue-300 hover:text-blue-400">
+          <p className="text-blue-400 mb-4">{error}</p>
+          <Link to="/products" className="text-blue-300 hover:text-blue-400">
             Back to Products
           </Link>
         </div>
@@ -223,6 +440,7 @@ const ProductDetailPage = () => {
   }
 
   if (!product) {
+    console.log("Rendering Loading State");
     return (
       <div className="min-h-screen bg-gradient-to-b from-gray-900 to-blue-950 flex items-center justify-center relative overflow-hidden">
         <p className="text-blue-300">Loading...</p>
@@ -230,8 +448,9 @@ const ProductDetailPage = () => {
     );
   }
 
+  console.log("Rendering Product Details for:", product.name);
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-blue-950 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-blue-900 relative overflow-hidden">
       <div id="starry-bg" className="absolute inset-0 overflow-hidden">
         <div
           className="absolute inset-0"
@@ -289,7 +508,7 @@ const ProductDetailPage = () => {
         />
       </div>
 
-      <Navbar />
+      <Header />
       <div className="container mx-auto px-4 py-12 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Image Gallery */}
@@ -339,7 +558,7 @@ const ProductDetailPage = () => {
                   ))}
                 </div>
                 <span className="text-blue-300 text-sm ml-2">
-                  {product.rating} ({product.reviewCount} reviews)
+                  {product.rating.toFixed(1)} ({product.reviewCount} reviews)
                 </span>
               </div>
             </div>
@@ -347,18 +566,18 @@ const ProductDetailPage = () => {
             <div>
               <div className="flex items-center space-x-2">
                 <span className="text-2xl font-bold text-white">
-                  ₹{product.price}
+                  ${product.price.toFixed(2)}
                 </span>
                 {product.originalPrice && (
                   <>
                     <span className="text-lg text-gray-400 line-through">
-                      ₹{product.originalPrice}
+                      ${product.originalPrice.toFixed(2)}
                     </span>
                     <span className="text-green-400">{discount}% OFF</span>
                   </>
                 )}
               </div>
-              <p className="text-blue-300 mt-1">
+              <p className="text-blue-300 mt ajudar-1">
                 {product.inStock ? "In Stock" : "Out of Stock"}
               </p>
             </div>
@@ -374,7 +593,7 @@ const ProductDetailPage = () => {
                       selectedSize === size
                         ? "bg-blue-500 text-white border-blue-500"
                         : "bg-black/40 text-blue-300 border-blue-900/50"
-                    } hover:bg-blue-600 hover:text-white transition`}
+                    } hover:bg-blue-600 hover:text-white transition-all duration-300`}
                   >
                     {size}
                   </button>
@@ -383,18 +602,14 @@ const ProductDetailPage = () => {
             </div>
 
             <div>
-              <h3 className="text-lg font-semibold text-white mb-2">
-                Select Color
-              </h3>
+              <h3 className="text-lg font-semibold text-white mb-2">Select Color</h3>
               <div className="flex space-x-2">
                 {product.colors.map((color) => (
                   <button
                     key={color.name}
                     onClick={() => setSelectedColor(color.name)}
                     className={`w-8 h-8 rounded-full border-2 ${
-                      selectedColor === color.name
-                        ? "border-blue-500"
-                        : "border-transparent"
+                      selectedColor === color.name ? "border-blue-500" : "border-transparent"
                     }`}
                     style={{ backgroundColor: color.hex }}
                     title={color.name}
@@ -421,7 +636,7 @@ const ProductDetailPage = () => {
               </div>
               <button
                 onClick={handleAddToCart}
-                className="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-3 px-6 rounded-md flex items-center justify-center"
+                className="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-6 rounded-md flex items-center justify-center transition-all duration-300"
                 disabled={!product.inStock}
               >
                 <ShoppingCart size={20} className="mr-2" />
@@ -430,11 +645,11 @@ const ProductDetailPage = () => {
               <button
                 onClick={handleAddToWishlist}
                 className={`p-3 rounded-md ${
-                  isFavorite ? "bg-red-500/50" : "bg-black/40"
-                } border border-blue-900/50 hover:bg-red-500/70`}
+                  isFavorite ? "bg-red-500/50" : "bg-black/20"
+                } border border-blue-900/50 hover:bg-red-500/70 transition-all duration-300`}
               >
                 <Heart
-                  size={20}
+                  size={24}
                   className={isFavorite ? "text-red-400 fill-current" : "text-blue-300"}
                 />
               </button>
@@ -505,22 +720,113 @@ const ProductDetailPage = () => {
               </ul>
             )}
           </div>
-        </div>
 
-        {/* Related Products */}
-        <div className="mt-12">
-          <h2 className="text-2xl font-bold text-white mb-6">
-            Related Products
-          </h2>
-          <RelatedProducts
-            category={product.category}
-            currentProductId={product.id}
-          />
+          {/* Reviews Section */}
+          <div className="mt-12">
+            <div className="border-b border-blue-900/50">
+              <button
+                onClick={() => toggleSection("reviews")}
+                className="flex justify-between w-full py-4 text-white font-semibold"
+              >
+                Reviews ({product.reviewCount})
+                {expandedSection === "reviews" ? (
+                  <ChevronUp size={20} />
+                ) : (
+                  <ChevronDown size={20} />
+                )}
+              </button>
+              {expandedSection === "reviews" && (
+                <div className="py-4">
+                  {reviews.length === 0 ? (
+                    <p className="text-blue-300">No reviews yet. Be the first to review!</p>
+                  ) : (
+                    <div className="space-y-4">
+                      {reviews.map((review) => (
+                        <div key={review._id} className="border-t border-blue-900/50 pt-4">
+                          <div className="flex items-center mb-2">
+                            <div className="flex">
+                              {[...Array(5)].map((_, i) => (
+                                <Star
+                                  key={i}
+                                  size={16}
+                                  className={
+                                    i < review.rating
+                                      ? "text-yellow-400 fill-current"
+                                      : "text-gray-400"
+                                  }
+                                />
+                              ))}
+                            </div>
+                            <span className="text-blue-300 text-sm ml-2">
+                              {review.userId?.username || "Anonymous"}
+                            </span>
+                          </div>
+                          <p className="text-blue-300">{review.comment}</p>
+                          <p className="text-gray-400 text-sm mt-1">
+                            {new Date(review.createdAt).toLocaleDateString()}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Review Form */}
+                  <form onSubmit={handleReviewSubmit} className="mt-8">
+                    <h3 className="text-lg font-semibold text-white mb-4">Write a Review</h3>
+                    <div className="mb-4">
+                      <label className="text-blue-300 mb-2 block">Rating</label>
+                      <div className="flex">
+                        {[...Array(5)].map((_, i) => (
+                          <button
+                            key={i}
+                            type="button"
+                            onClick={() => handleRatingChange(i + 1)}
+                            className="focus:outline-none"
+                          >
+                            <Star
+                              size={24}
+                              className={
+                                i < newReview.rating
+                                  ? "text-yellow-400 fill-current"
+                                  : "text-gray-400"
+                              }
+                            />
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="mb-4">
+                      <label htmlFor="comment" className="text-blue-300 mb-2 block">
+                        Comment
+                      </label>
+                      <textarea
+                        id="comment"
+                        value={newReview.comment}
+                        onChange={(e) =>
+                          setNewReview({ ...newReview, comment: e.target.value })
+                        }
+                        className="w-full bg-black/40 border border-blue-900/50 text-blue-300 rounded-md p-3 focus:outline-none focus:border-blue-500"
+                        rows="4"
+                        placeholder="Share your thoughts about the product..."
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-6 rounded-md transition-all duration-300"
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? "Submitting..." : "Submit Review"}
+                    </button>
+                  </form>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
       <Footer />
 
-      <style>{`
+      <style jsx>{`
         @keyframes star-rotation {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }

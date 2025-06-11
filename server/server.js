@@ -1,4 +1,4 @@
-const dotenv = require("dotenv");
+require('dotenv').config();
 const express = require("express");
 const authRoutes = require("./routes/auth");
 const googleRoutes = require("./routes/google");
@@ -6,12 +6,19 @@ const userRoutes = require("./routes/userRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const wishlistRoutes = require("./routes/WishlistRoutes");
 const productRoutes = require('./routes/productRoutes');
+const cartRoutes = require('./routes/cartRoutes'); 
+const reviewRoutes = require('./routes/reviewRoutes');
+const paypalRoutes = require('./routes/paymentRoutes'); 
+const settingsRoutes = require('./routes/settingsRoutes');
+const analyticsRoutes = require('./routes/AnalyticsRoutes');
+const discountRoutes = require('./routes/discountRoutes');
+const queryRoutes = require('./routes/queryRoutes');
+const newsletterRoutes = require('./routes/newsletterRoutes');
+
 const cors = require("cors");
 const connectDB = require("./config/db");
 const helmet = require("helmet");
 const path = require("path");
-
-dotenv.config();
 
 const app = express();
 
@@ -19,7 +26,6 @@ const app = express();
 app.use(express.json());
 app.use("/uploads", express.static(path.join(__dirname, "Uploads")));
 
-// CORS configuration
 const corsOptions = {
   origin: "http://localhost:5173",
   methods: ["GET", "POST", "PUT", "DELETE"],
@@ -27,16 +33,15 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
-// Helmet security middleware
 app.use(helmet());
 app.use(
   helmet.contentSecurityPolicy({
     directives: {
       defaultSrc: ["'self'"],
-      imgSrc: ["'self'", "http://localhost:5002", "http://localhost:5173", "data:"],
+      imgSrc: ["'self'", "http://localhost:5002", "http://localhost:5173", "data:", "https://res.cloudinary.com"],
       connectSrc: ["'self'", "http://localhost:5002", "http://localhost:5173"],
-      scriptSrc: ["'self'", "'unsafe-inline'"], // Allow inline scripts for frontend
-      styleSrc: ["'self'", "'unsafe-inline'"], // Allow inline styles
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
       fontSrc: ["'self'"],
     },
   })
@@ -52,8 +57,16 @@ app.use("/api/users", userRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/wishlist", wishlistRoutes);
 app.use('/api/products', productRoutes);
+app.use('/api/cart', cartRoutes); 
+app.use('/api/paypal', paypalRoutes);
+app.use('/api/reviews', reviewRoutes);
+app.use('/api/settings',settingsRoutes)
+app.use('/api/analytics', analyticsRoutes);
+app.use('/api/discounts', discountRoutes);
+app.use('/api/queries', queryRoutes);
+app.use('/api/newsletter', newsletterRoutes);
 
-// Global error handling middleware
+// Error handling middleware
 app.use((err, req, res, next) => {
   console.error("Server Error:", err.stack);
   res.status(err.status || 500).json({
@@ -62,7 +75,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Handle unmatched routes
+// 404 handler
 app.use((req, res) => {
   res.status(404).json({ message: "Route not found" });
 });

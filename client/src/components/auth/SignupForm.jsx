@@ -1,5 +1,4 @@
 
-"use client"
 
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
@@ -11,6 +10,7 @@ const SignupForm = () => {
     email: "",
     password: "",
     confirmPassword: "",
+    otp: "",
   })
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
@@ -41,29 +41,81 @@ const SignupForm = () => {
     return true
   }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if (step === 1) {
-      if (!validateForm()) return;
-      setStep(2);
-    } else {
-      if (!selectedAvatar) {
-        setError("Please select an avatar");
-        return;
+  const handleSendOtp = async () => {
+    setLoading(true)
+    try {
+      const response = await fetch("http://localhost:5002/api/auth/send-otp", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: formData.email }),
+      })
+
+      const data = await response.json()
+      if (response.ok) {
+        setStep(3)
+      } else {
+        setError(data.message || "Error sending OTP")
       }
-      
-      setLoading(true);
+    } catch (err) {
+      setError("Server error. Please try again later.")
+      console.error("Error sending OTP:", err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleVerifyOtp = async () => {
+    setLoading(true)
+    try {
+      const response = await fetch("http://localhost:5002/api/auth/verify-otp", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: formData.email, otp: formData.otp }),
+      })
+
+      const data = await response.json()
+      if (response.ok) {
+        setStep(2)
+      } else {
+        setError(data.message || "Invalid or expired OTP")
+      }
+    } catch (err) {
+      setError("Server error. Please try again later.")
+      console.error("Error verifying OTP:", err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+
+    if (step === 1) {
+      if (!validateForm()) return
+      await handleSendOtp()
+    } else if (step === 3) {
+      await handleVerifyOtp()
+    } else if (step === 2) {
+      if (!selectedAvatar) {
+        setError("Please select an avatar")
+        return
+      }
+
+      setLoading(true)
       try {
-        const selectedAvatarData = avatars.find((avatar) => avatar.id === selectedAvatar);
+        const selectedAvatarData = avatars.find((avatar) => avatar.id === selectedAvatar)
         const payload = {
           name: formData.name,
           email: formData.email,
           password: formData.password,
-          profilePicture: selectedAvatarData.image, // Send the image URL
+          profilePicture: selectedAvatarData.image,
           authProvider: 'local',
-        };
-        console.log("Sending signup data:", payload); // Debug log
+        }
+        console.log("Sending signup data:", payload)
 
         const response = await fetch("http://localhost:5002/api/auth/signup", {
           method: "POST",
@@ -71,25 +123,25 @@ const SignupForm = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(payload),
-        });
+        })
 
-        const data = await response.json();
+        const data = await response.json()
 
         if (response.ok) {
-          localStorage.setItem("token", data.token);
-          console.log("Signup successful:", data);
-          navigate("/profile"); // Redirect to profile
+          localStorage.setItem("token", data.token)
+          console.log("Signup successful:", data)
+          navigate("/profile")
         } else {
-          setError(data.message || "Something went wrong during signup");
+          setError(data.message || "Something went wrong during signup")
         }
       } catch (err) {
-        setError("Server error. Please try again later.");
-        console.error("Error submitting form:", err);
+        setError("Server error. Please try again later.")
+        console.error("Error submitting form:", err)
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
     }
-  };
+  }
 
   // Superhero avatars
   const avatars = [
@@ -109,74 +161,74 @@ const SignupForm = () => {
 
   // Generate glowing stars dynamically
   const renderGlowingStars = () => {
-    const stars = [];
+    const stars = []
     for (let i = 0; i < 20; i++) {
-      const size = Math.random() * 3 + 1;
-      const top = Math.random() * 100;
-      const left = Math.random() * 100;
-      const delay = Math.random() * 5;
-      const duration = Math.random() * 3 + 2;
+      const size = Math.random() * 3 + 1
+      const top = Math.random() * 100
+      const left = Math.random() * 100
+      const delay = Math.random() * 5
+      const duration = Math.random() * 3 + 2
       stars.push(
-        <div 
+        <div
           key={i}
-          className="glowing-star" 
+          className="glowing-star"
           style={{
             width: `${size}px`,
             height: `${size}px`,
             top: `${top}%`,
             left: `${left}%`,
-            boxShadow: `0 0 ${size * 2}px ${size/2}px rgba(255, 255, 255, 0.8)`,
+            boxShadow: `0 0 ${size * 2}px ${size / 2}px rgba(255, 255, 255, 0.8)`,
             animationDuration: `${duration}s`,
-            animationDelay: `${delay}s`
+            animationDelay: `${delay}s`,
           }}
         />
-      );
+      )
     }
-    return stars;
-  };
+    return stars
+  }
 
   // Generate shooting stars
   const renderShootingStars = () => {
-    const shootingStars = [];
+    const shootingStars = []
     for (let i = 0; i < 5; i++) {
-      const width = Math.random() * 100 + 50;
-      const top = Math.random() * 100;
-      const left = Math.random() * 50;
-      const delay = Math.random() * 15;
-      const duration = Math.random() * 2 + 1;
-      const angle = Math.random() * 60 - 30;
-      
+      const width = Math.random() * 100 + 50
+      const top = Math.random() * 100
+      const left = Math.random() * 50
+      const delay = Math.random() * 15
+      const duration = Math.random() * 2 + 1
+      const angle = Math.random() * 60 - 30
+
       shootingStars.push(
-        <div 
+        <div
           key={i}
-          className="shooting-star" 
+          className="shooting-star"
           style={{
             width: `${width}px`,
             top: `${top}%`,
             left: `${left}%`,
             transform: `rotate(${angle}deg)`,
-            animation: `shoot ${duration}s ${delay}s linear infinite`
+            animation: `shoot ${duration}s ${delay}s linear infinite`,
           }}
         />
-      );
+      )
     }
-    return shootingStars;
-  };
+    return shootingStars
+  }
 
   // Generate pulsating stars
   const renderPulsatingStars = () => {
-    const stars = [];
+    const stars = []
     for (let i = 0; i < 15; i++) {
-      const size = Math.random() * 2 + 1;
-      const top = Math.random() * 100;
-      const left = Math.random() * 100;
-      const delay = Math.random() * 5;
-      const duration = Math.random() * 3 + 3;
-      
+      const size = Math.random() * 2 + 1
+      const top = Math.random() * 100
+      const left = Math.random() * 100
+      const delay = Math.random() * 5
+      const duration = Math.random() * 3 + 3
+
       stars.push(
-        <div 
+        <div
           key={i}
-          className="pulsating-star" 
+          className="pulsating-star"
           style={{
             width: `${size}px`,
             height: `${size}px`,
@@ -184,13 +236,13 @@ const SignupForm = () => {
             left: `${left}%`,
             boxShadow: `0 0 ${size * 3}px ${size}px rgba(100, 200, 255, 0.8)`,
             animationDuration: `${duration}s`,
-            animationDelay: `${delay}s`
+            animationDelay: `${delay}s`,
           }}
         />
-      );
+      )
     }
-    return stars;
-  };
+    return stars
+  }
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-gray-900 to-blue-950 relative overflow-hidden">
@@ -206,7 +258,7 @@ const SignupForm = () => {
               radial-gradient(2.5px 2.5px at 80% 20%, rgba(255, 255, 255, 0.7) 1%, transparent 1%)
             `,
             backgroundSize: "200px 200px, 150px 150px, 100px 100px, 250px 250px, 300px 300px",
-            animation: "star-rotation 500s linear infinite"
+            animation: "star-rotation 500s linear infinite",
           }}
         />
         <div
@@ -218,12 +270,14 @@ const SignupForm = () => {
               radial-gradient(1px 1px at 30% 80%, white 1%, transparent 1%)
             `,
             backgroundSize: "250px 250px, 300px 300px, 350px 350px",
-            animation: "star-rotation-reverse 600s linear infinite"
+            animation: "star-rotation-reverse 600s linear infinite",
           }}
         />
-        <div className="absolute inset-0 opacity-30" 
+        <div
+          className="absolute inset-0 opacity-30"
           style={{
-            background: "radial-gradient(circle at 70% 20%, rgba(32, 43, 100, 0.4) 0%, transparent 25%), radial-gradient(circle at 30% 70%, rgba(43, 36, 82, 0.4) 0%, transparent 25%)"
+            background:
+              "radial-gradient(circle at 70% 20%, rgba(32, 43, 100, 0.4) 0%, transparent 25%), radial-gradient(circle at 30% 70%, rgba(43, 36, 82, 0.4) 0%, transparent 25%)",
           }}
         />
         <div className="star-cluster-1 absolute w-32 h-32 opacity-40"></div>
@@ -231,30 +285,42 @@ const SignupForm = () => {
         {renderGlowingStars()}
         {renderPulsatingStars()}
         {renderShootingStars()}
-        <div className="absolute top-1/4 left-1/4 w-1/2 h-1/2 rounded-full opacity-20"
+        <div
+          className="absolute top-1/4 left-1/4 w-1/2 h-1/2 rounded-full opacity-20"
           style={{
             background: "radial-gradient(circle, rgba(0, 150, 255, 0.3) 0%, transparent 70%)",
             filter: "blur(40px)",
-            animation: "nebula-pulse 8s infinite alternate ease-in-out"
+            animation: "nebula-pulse 8s infinite alternate ease-in-out",
           }}
         />
-        <div className="absolute bottom-1/3 right-1/3 w-1/3 h-1/3 rounded-full opacity-15"
+        <div
+          className="absolute bottom-1/3 right-1/3 w-1/3 h-1/3 rounded-full opacity-15"
           style={{
             background: "radial-gradient(circle, rgba(100, 0, 255, 0.2) 0%, transparent 70%)",
             filter: "blur(30px)",
-            animation: "nebula-pulse 12s infinite alternate-reverse ease-in-out"
+            animation: "nebula-pulse 12s infinite alternate-reverse ease-in-out",
           }}
         />
       </div>
 
       <div className="max-w-md w-full space-y-8 relative z-10">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-white" 
-               style={{textShadow: "0 0 10px rgba(100, 200, 255, 0.7)"}}>
-            {step === 1 ? "Create your account" : "Choose your superhero avatar"}
+          <h2
+            className="mt-6 text-center text-3xl font-extrabold text-white"
+            style={{ textShadow: "0 0 10px rgba(100, 200, 255, 0.7)" }}
+          >
+            {step === 1
+              ? "Create your account"
+              : step === 2
+              ? "Choose your superhero avatar"
+              : "Verify your email"}
           </h2>
           <p className="mt-2 text-center text-sm text-blue-300">
-            {step === 1 ? "Join our community of comic enthusiasts" : "Select an avatar that represents you"}
+            {step === 1
+              ? "Join our community of comic enthusiasts"
+              : step === 2
+              ? "Select an avatar that represents you"
+              : "Enter the OTP sent to your email"}
           </p>
         </div>
 
@@ -265,13 +331,16 @@ const SignupForm = () => {
                 {error}
               </div>
             )}
-            
+
             <form onSubmit={handleSubmit}>
               {step === 1 ? (
                 <>
                   <div className="rounded-md shadow-sm -space-y-px mb-6">
                     <div className="mb-4">
-                      <label htmlFor="name" className="block text-sm font-medium text-blue-300 mb-1 text-glow-blue">
+                      <label
+                        htmlFor="name"
+                        className="block text-sm font-medium text-blue-300 mb-1 text-glow-blue"
+                      >
                         Full Name
                       </label>
                       <div className="relative">
@@ -292,7 +361,10 @@ const SignupForm = () => {
                     </div>
 
                     <div className="mb-4">
-                      <label htmlFor="email" className="block text-sm font-medium text-blue-300 mb-1 text-glow-blue">
+                      <label
+                        htmlFor="email"
+                        className="block text-sm font-medium text-blue-300 mb-1 text-glow-blue"
+                      >
                         Email Address
                       </label>
                       <div className="relative">
@@ -314,7 +386,10 @@ const SignupForm = () => {
                     </div>
 
                     <div className="mb-4">
-                      <label htmlFor="password" className="block text-sm font-medium text-blue-300 mb-1 text-glow-blue">
+                      <label
+                        htmlFor="password"
+                        className="block text-sm font-medium text-blue-300 mb-1 text-glow-blue"
+                      >
                         Password
                       </label>
                       <div className="relative">
@@ -338,14 +413,21 @@ const SignupForm = () => {
                             onClick={() => setShowPassword(!showPassword)}
                             className="text-blue-400 hover:text-blue-300 focus:outline-none"
                           >
-                            {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                            {showPassword ? (
+                              <EyeOff className="h-5 w-5" />
+                            ) : (
+                              <Eye className="h-5 w-5" />
+                            )}
                           </button>
                         </div>
                       </div>
                     </div>
 
                     <div>
-                      <label htmlFor="confirmPassword" className="block text-sm font-medium text-blue-300 mb-1 text-glow-blue">
+                      <label
+                        htmlFor="confirmPassword"
+                        className="block text-sm font-medium text-blue-300 mb-1 text-glow-blue"
+                      >
                         Confirm Password
                       </label>
                       <div className="relative">
@@ -366,10 +448,16 @@ const SignupForm = () => {
                         <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
                           <button
                             type="button"
-                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            onClick={() =>
+                              setShowConfirmPassword(!showConfirmPassword)
+                            }
                             className="text-blue-400 hover:text-blue-300 focus:outline-none"
                           >
-                            {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                            {showConfirmPassword ? (
+                              <EyeOff className="h-5 w-5" />
+                            ) : (
+                              <Eye className="h-5 w-5" />
+                            )}
                           </button>
                         </div>
                       </div>
@@ -379,13 +467,57 @@ const SignupForm = () => {
                   <div>
                     <button
                       type="submit"
+                      disabled={loading}
                       className="group relative w-full flex justify-center py-3 px-4 border border-blue-900/50 rounded-lg text-white bg-blue-900/30 hover:bg-blue-800/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 items-center shadow-[0_0_10px_rgba(0,191,255,0.3)] hover:shadow-[0_0_15px_rgba(0,191,255,0.5)] transition-all duration-300"
                     >
                       <span className="absolute left-0 inset-y-0 flex items-center pl-3">
                         <UserPlus className="h-5 w-5 text-blue-400 group-hover:text-blue-300" />
                       </span>
-                      Continue
+                      {loading ? "Sending OTP..." : "Continue"}
                       <ArrowRight className="ml-2 h-5 w-5 text-blue-400 group-hover:text-blue-300" />
+                    </button>
+                  </div>
+                </>
+              ) : step === 3 ? (
+                <>
+                  <div className="mb-6">
+                    <label
+                      htmlFor="otp"
+                      className="block text-sm font-medium text-blue-300 mb-1 text-glow-blue"
+                    >
+                      OTP
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <Mail className="h-5 w-5 text-blue-400" />
+                      </div>
+                      <input
+                        id="otp"
+                        name="otp"
+                        type="text"
+                        required
+                        value={formData.otp}
+                        onChange={handleChange}
+                        className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 pr-3 py-3 border border-blue-900/50 bg-black/30 text-white rounded-lg placeholder-blue-300/70 backdrop-blur-sm"
+                        placeholder="Enter 6-digit OTP"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex space-x-4">
+                    <button
+                      type="button"
+                      onClick={() => setStep(1)}
+                      className="flex-1 py-3 px-4 border border-blue-900/50 rounded-lg text-blue-300 bg-black/50 hover:bg-blue-900/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300"
+                    >
+                      Back
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="flex-1 py-3 px-4 border border-blue-900/50 rounded-lg text-white bg-blue-900/30 hover:bg-blue-800/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 shadow-[0_0_10px_rgba(0,191,255,0.3)] hover:shadow-[0_0_15px_rgba(0,191,255,0.5)] transition-all duration-300"
+                    >
+                      {loading ? "Verifying..." : "Verify OTP"}
                     </button>
                   </div>
                 </>
@@ -393,7 +525,8 @@ const SignupForm = () => {
                 <>
                   <div className="mb-6">
                     <p className="text-sm text-blue-300 mb-4">
-                      Choose a superhero avatar that represents you. This will be displayed on your profile and reviews.
+                      Choose a superhero avatar that represents you. This will be
+                      displayed on your profile and reviews.
                     </p>
                     <div className="grid grid-cols-3 gap-4">
                       {avatars.map((avatar) => (
@@ -411,7 +544,9 @@ const SignupForm = () => {
                             alt={avatar.name}
                             className="w-full h-auto rounded-full aspect-square object-cover"
                           />
-                          <p className="text-xs text-center mt-1 font-medium truncate text-blue-300">{avatar.name}</p>
+                          <p className="text-xs text-center mt-1 font-medium truncate text-blue-300">
+                            {avatar.name}
+                          </p>
                         </div>
                       ))}
                     </div>
@@ -420,7 +555,7 @@ const SignupForm = () => {
                   <div className="flex space-x-4">
                     <button
                       type="button"
-                      onClick={() => setStep(1)}
+                      onClick={() => setStep(3)}
                       className="flex-1 py-3 px-4 border border-blue-900/50 rounded-lg text-blue-300 bg-black/50 hover:bg-blue-900/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300"
                     >
                       Back
@@ -429,7 +564,9 @@ const SignupForm = () => {
                       type="submit"
                       disabled={!selectedAvatar || loading}
                       className={`flex-1 py-3 px-4 border border-blue-900/50 rounded-lg text-white ${
-                        selectedAvatar && !loading ? "bg-blue-900/30 hover:bg-blue-800/50 shadow-[0_0_10px_rgba(0,191,255,0.3)] hover:shadow-[0_0_15px_rgba(0,191,255,0.5)]" : "bg-blue-900/10 cursor-not-allowed"
+                        selectedAvatar && !loading
+                          ? "bg-blue-900/30 hover:bg-blue-800/50 shadow-[0_0_10px_rgba(0,191,255,0.3)] hover:shadow-[0_0_15px_rgba(0,191,255,0.5)]"
+                          : "bg-blue-900/10 cursor-not-allowed"
                       } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300`}
                     >
                       {loading ? "Signing Up..." : "Complete Sign Up"}
@@ -442,7 +579,10 @@ const SignupForm = () => {
             <div className="mt-6 text-center">
               <p className="text-sm text-blue-300">
                 Already have an account?{" "}
-                <Link to="/login" className="font-medium text-blue-400 hover:text-blue-300 hover:underline transition-all duration-300">
+                <Link
+                  to="/login"
+                  className="font-medium text-blue-400 hover:text-blue-300 hover:underline transition-all duration-300"
+                >
                   Sign in
                 </Link>
               </p>
@@ -455,7 +595,9 @@ const SignupForm = () => {
                     <div className="w-full border-t border-blue-900/30"></div>
                   </div>
                   <div className="relative flex justify-center text-sm">
-                    <span className="px-2 bg-black/30 text-blue-300 backdrop-blur-sm">Or continue with</span>
+                    <span className="px-2 bg-black/30 text-blue-300 backdrop-blur-sm">
+                      Or continue with
+                    </span>
                   </div>
                 </div>
 
@@ -504,20 +646,35 @@ const SignupForm = () => {
 
       <style jsx>{`
         @keyframes star-rotation {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
+          0% {
+            transform: rotate(0deg);
+          }
+          100% {
+            transform: rotate(360deg);
+          }
         }
-        
+
         @keyframes star-rotation-reverse {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(-360deg); }
+          0% {
+            transform: rotate(0deg);
+          }
+          100% {
+            transform: rotate(-360deg);
+          }
         }
-        
+
         @keyframes twinkle {
-          0%, 100% { opacity: 0.5; transform: scale(1); }
-          50% { opacity: 1; transform: scale(1.2); }
+          0%,
+          100% {
+            opacity: 0.5;
+            transform: scale(1);
+          }
+          50% {
+            opacity: 1;
+            transform: scale(1.2);
+          }
         }
-        
+
         .shooting-star {
           position: absolute;
           height: 2px;
@@ -526,7 +683,7 @@ const SignupForm = () => {
           box-shadow: 0 0 5px 1px rgba(0, 191, 255, 0.6);
           animation: shoot linear forwards;
         }
-        
+
         @keyframes shoot {
           0% {
             transform: translateX(0) translateY(0) rotate(inherit);
@@ -540,31 +697,48 @@ const SignupForm = () => {
             opacity: 0;
           }
         }
-        
+
         .pulsating-star {
           position: absolute;
           border-radius: 50%;
           background-color: white;
           animation: pulsate 3s infinite ease-in-out;
         }
-        
+
         @keyframes pulsate {
-          0%, 100% { opacity: 0.2; transform: scale(1); box-shadow: 0 0 5px 2px rgba(255, 255, 255, 0.2); }
-          50% { opacity: 1; transform: scale(1.5); box-shadow: 0 0 10px 4px rgba(100, 200, 255, 0.7); }
+          0%,
+          100% {
+            opacity: 0.2;
+            transform: scale(1);
+            box-shadow: 0 0 5px 2px rgba(255, 255, 255, 0.2);
+          }
+          50% {
+            opacity: 1;
+            transform: scale(1.5);
+            box-shadow: 0 0 10px 4px rgba(100, 200, 255, 0.7);
+          }
         }
-        
+
         .glowing-star {
           position: absolute;
           border-radius: 50%;
           background-color: white;
           animation: glow 4s infinite ease-in-out alternate;
         }
-        
+
         @keyframes glow {
-          0% { transform: scale(0.8); opacity: 0.6; box-shadow: 0 0 5px 2px rgba(255, 255, 255, 0.4); }
-          100% { transform: scale(1.2); opacity: 1; box-shadow: 0 0 15px 5px rgba(100, 200, 255, 0.8); }
+          0% {
+            transform: scale(0.8);
+            opacity: 0.6;
+            box-shadow: 0 0 5px 2px rgba(255, 255, 255, 0.4);
+          }
+          100% {
+            transform: scale(1.2);
+            opacity: 1;
+            box-shadow: 0 0 15px 5px rgba(100, 200, 255, 0.8);
+          }
         }
-        
+
         .star-cluster-1 {
           top: 20%;
           left: 15%;
@@ -574,7 +748,7 @@ const SignupForm = () => {
           animation: cluster-drift 60s infinite linear alternate;
           box-shadow: 0 0 20px 10px rgba(100, 200, 255, 0.2);
         }
-        
+
         .star-cluster-2 {
           bottom: 30%;
           right: 20%;
@@ -584,19 +758,34 @@ const SignupForm = () => {
           animation: cluster-drift 70s infinite linear alternate-reverse;
           box-shadow: 0 0 20px 10px rgba(100, 200, 255, 0.2);
         }
-        
+
         @keyframes cluster-drift {
-          0% { transform: translate(0, 0) rotate(0deg); }
-          50% { transform: translate(30px, 20px) rotate(180deg); }
-          100% { transform: translate(-30px, -20px) rotate(360deg); }
+          0% {
+            transform: translate(0, 0) rotate(0deg);
+          }
+          50% {
+            transform: translate(30px, 20px) rotate(180deg);
+          }
+          100% {
+            transform: translate(-30px, -20px) rotate(360deg);
+          }
         }
-        
+
         @keyframes nebula-pulse {
-          0% { opacity: 0.15; transform: scale(1); }
-          50% { opacity: 0.25; transform: scale(1.1); }
-          100% { opacity: 0.15; transform: scale(1); }
+          0% {
+            opacity: 0.15;
+            transform: scale(1);
+          }
+          50% {
+            opacity: 0.25;
+            transform: scale(1.1);
+          }
+          100% {
+            opacity: 0.15;
+            transform: scale(1);
+          }
         }
-        
+
         .text-glow-blue {
           text-shadow: 0 0 5px rgba(0, 191, 255, 0.7);
         }
@@ -605,4 +794,4 @@ const SignupForm = () => {
   )
 }
 
-export default SignupForm;
+export default SignupForm

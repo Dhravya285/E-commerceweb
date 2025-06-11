@@ -1,8 +1,8 @@
-"use client";
+
 
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Search, ShoppingCart, Heart, User, Menu, X } from "lucide-react";
+import { Search, ShoppingCart, User, Menu, X, Bell } from "lucide-react";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -152,12 +152,13 @@ export default function Header() {
 
           {/* Navigation */}
           <nav className="hidden md:flex space-x-8">
-            {["Home", "Shop", "Men", "Women", "About"].map((item) => (
+            {["Home", "Shop", "About", "Offers"].map((item) => (
               <Link
                 key={item}
-                to={item === "Home" ? "/" : `/${item.toLowerCase()}`}
-                className="text-white hover:text-blue-300 transition-all duration-300 font-medium relative group"
+                to={item === "Home" ? "/" : item === "Shop" ? "/products" : item === "Offers" ? "/notifications" : `/${item.toLowerCase()}`}
+                className="text-white hover:text-blue-300 transition-all duration-300 font-medium relative group flex items-center"
               >
+                {item === "Offers" && <Bell className="h-4 w-4 mr-1" />}
                 {item}
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-400 transition-all duration-300 group-hover:w-full"></span>
               </Link>
@@ -166,9 +167,6 @@ export default function Header() {
 
           {/* Right Side Icons + Auth */}
           <div className="flex items-center space-x-4">
-            <Link to="/wishlist" className="text-white hover:text-blue-300 transition-all duration-300 transform hover:scale-110">
-              <Heart size={24} />
-            </Link>
             <Link to="/cart" className="text-white hover:text-blue-300 transition-all duration-300 transform hover:scale-110 relative">
               <ShoppingCart size={24} />
               <span className="absolute -top-2 -right-2 bg-blue-400 text-black rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold shadow-[0_0_5px_rgba(0,191,255,0.5)]">
@@ -198,17 +196,18 @@ export default function Header() {
         {isMenuOpen && (
           <div className="md:hidden absolute top-full left-0 right-0 bg-black/80 backdrop-blur-md p-4 border-t border-blue-900 animate-fadeIn">
             <nav className="flex flex-col space-y-4">
-              {["Home", "Shop", "Men", "Women", "About"].map((item) => (
+              {["Home", "Shop", "About", "Offers"].map((item) => (
                 <Link
                   key={item}
-                  to={item === "Home" ? "/" : `/${item.toLowerCase()}`}
-                  className="text-white hover:text-blue-300 transition-colors font-medium py-2 border-b border-blue-900/30"
+                  to={item === "Home" ? "/" : item === "Shop" ? "/products" : item === "Offers" ? "/notifications" : `/${item.toLowerCase()}`}
+                  className="text-white hover:text-blue-300 transition-colors font-medium py-2 border-b border-blue-900/30 flex items-center"
                   onClick={() => setIsMenuOpen(false)}
                 >
+                  {item === "Offers" && <Bell className="h-4 w-4 mr-2" />}
                   {item}
                 </Link>
               ))}
-              <Link to="/signin" className="text-white hover:text-blue-300 transition-colors font-medium py-2 border-b border-blue-900/30" onClick={() => setIsMenuOpen(false)}>
+              <Link to="/login" className="text-white hover:text-blue-300 transition-colors font-medium py-2 border-b border-blue-900/30" onClick={() => setIsMenuOpen(false)}>
                 Sign In
               </Link>
               <Link to="/signup" className="text-white hover:text-blue-300 transition-colors font-medium py-2 border-b border-blue-900/30" onClick={() => setIsMenuOpen(false)}>

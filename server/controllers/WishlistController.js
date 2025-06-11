@@ -28,7 +28,7 @@ const addToWishlist = asyncHandler(async (req, res) => {
 
 const getWishlist = asyncHandler(async (req, res) => {
   const wishlist = await Wishlist.find({ userId: req.user.id }).populate("productId");
-  res.json(wishlist);
+  res.json(wishlist); // Return array directly
 });
 
 const removeFromWishlist = asyncHandler(async (req, res) => {

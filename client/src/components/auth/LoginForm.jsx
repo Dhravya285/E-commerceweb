@@ -1,24 +1,26 @@
-"use client"
 
-import { useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
-import { Mail, Lock, Eye, EyeOff, LogIn } from "lucide-react"
- import { GoogleLogin } from '@react-oauth/google';
+
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Mail, Lock, Eye, EyeOff, LogIn } from "lucide-react";
+import { GoogleLogin } from '@react-oauth/google';
 import axios from 'axios';
+import toast from "react-hot-toast"; // Add toast for user feedback
+
 const LoginForm = () => {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [showPassword, setShowPassword] = useState(false)
-  const [rememberMe, setRememberMe] = useState(false)
-  const [error, setError] = useState("")
-  const [loading, setLoading] = useState(false)
-  const navigate = useNavigate()
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setError("")
-    setLoading(true)
-    
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
     try {
       const response = await fetch("http://localhost:5002/api/auth/login", {
         method: "POST",
@@ -30,64 +32,65 @@ const LoginForm = () => {
           password,
           rememberMe 
         }),
-      })
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (response.ok) {
-        console.log("Login successful:", data)
+        console.log("Login successful:", data);
         
-        // Store token in localStorage or sessionStorage based on rememberMe
-        if (data.token) {
-          if (rememberMe) {
-            localStorage.setItem("token", data.token)
-          } else {
-            sessionStorage.setItem("token", data.token)
-          }
+        // Store token and userId
+        if (data.token && data.user) {
+          const storage = rememberMe ? localStorage : sessionStorage;
+          storage.setItem("token", data.token);
+          storage.setItem("userId", data.user._id || data.user.id); // Store userId explicitly
+          storage.setItem("user", JSON.stringify(data.user)); // Keep existing user storage
           
-          // Store user data if needed
-          if (data.user) {
-            localStorage.setItem("user", JSON.stringify(data.user))
-          }
-          
-          // Redirect to dashboard or home page
-          navigate("/profile")
+          toast.success("Logged in successfully!");
+          navigate("/profile");
         } else {
-          setError("Authentication successful but no token received")
+          setError("Authentication successful but missing token or user data");
+          toast.error("Login failed: Missing token or user data");
         }
       } else {
-        setError(data.message || "Invalid email or password")
+        setError(data.message || "Invalid email or password");
+        toast.error(data.message || "Invalid email or password");
       }
     } catch (err) {
-      console.error("Error during login:", err)
-      setError("Server error. Please try again later.")
+      console.error("Error during login:", err);
+      setError("Server error. Please try again later.");
+      toast.error("Server error. Please try again later.");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleGoogleSuccess = async (credentialResponse) => {
     try {
       const token = credentialResponse.credential;
       const res = await axios.post('http://localhost:5002/api/google', { token });
-  
-      if (res.data?.token) {
+
+      if (res.data?.token && res.data?.user) {
         localStorage.setItem("token", res.data.token);
+        localStorage.setItem("userId", res.data.user._id || res.data.user.id); // Store userId
         localStorage.setItem("user", JSON.stringify(res.data.user));
+        toast.success("Logged in with Google!");
         navigate("/profile");
       } else {
-        setError("Google authentication succeeded, but no token received.");
+        setError("Google authentication succeeded, but no token or user received.");
+        toast.error("Google login failed: Missing token or user");
       }
     } catch (err) {
       console.error("Google sign-in failed:", err);
       setError("Google sign-in failed.");
+      toast.error("Google sign-in failed.");
     }
   };
-  
+
   const handleGoogleError = () => {
     setError("Google sign-in was unsuccessful. Try again later.");
+    toast.error("Google sign-in failed.");
   };
-  
 
   // Generate glowing stars dynamically
   const renderGlowingStars = () => {
@@ -330,11 +333,11 @@ const LoginForm = () => {
                   </label>
                 </div>
 
-                <div className="text-sm">
+                {/* <div className="text-sm">
                   <Link to="/forgot-password" className="font-medium text-blue-400 hover:text-blue-300 hover:underline transition-all duration-300">
                     Forgot your password?
                   </Link>
-                </div>
+                </div> */}
               </div>
 
               <div>

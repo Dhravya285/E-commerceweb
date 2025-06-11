@@ -1,7 +1,8 @@
-"use client";
+
 
 import { useState, useEffect } from "react";
-import { Filter, ChevronDown, ChevronUp, X } from "lucide-react";
+import { Filter, ChevronDown, ChevronUp, X, ArrowRight, Star } from "lucide-react";
+import { Link } from "react-router-dom";
 import ProductCard from "./ProductCard";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -9,6 +10,7 @@ import toast from "react-hot-toast";
 const ProductListingPage = () => {
   const [products, setProducts] = useState([]);
   const [filters, setFilters] = useState({
+    gender: [],
     categories: [],
     subcategories: [],
     priceRange: [0, 2000],
@@ -16,7 +18,9 @@ const ProductListingPage = () => {
     newArrivals: false,
   });
   const [sortBy, setSortBy] = useState("featured");
+  
   const [expandedFilters, setExpandedFilters] = useState({
+    gender: true,
     categories: true,
     subcategories: true,
     price: true,
@@ -27,35 +31,70 @@ const ProductListingPage = () => {
   const [totalProducts, setTotalProducts] = useState(0);
   const [showAll, setShowAll] = useState(false);
 
+  const menCategories = [
+    { name: "Graphic Tees", image: "https://i.pinimg.com/originals/3c/4b/c6/3c4bc697ab443981b57ecda389db42a1.jpg", count: 42 },
+    { name: "Oversized Fits", image: "https://tse3.mm.bing.net/th?id=OIP.VzFeft62u1aa9ExKweqo-AAAAA&pid=Api&P=0&h=180", count: 28 },
+    { name: "Hoodies", image: "https://1.bp.blogspot.com/-Z-7bRmz1pfc/VWQThXBIbZI/AAAAAAAAAGs/xWsujezxU6M/s1600/hoodie2.jpg", count: 16 },
+    { name: "Accessories", image: "https://tse1.mm.bing.net/th?id=OIP.FxwrviRZ3Acu-y1NJWRRigHaHa&pid=Api&P=0&h=180", count: 23 },
+  ];
+
+  const womenCategories = [
+    { name: "Graphic Tees", image: "https://i5.walmartimages.com/asr/7cb0237a-538b-4d83-9dea-35432ee10cb1_1.3fd4e72403f6b82ef62f7739ff36fa96.jpeg", count: 38 },
+    { name: "Crop Tops", image: "https://img.ltwebstatic.com/images/pi/201711/e8/15115155444351802642.jpg", count: 24 },
+    { name: "Hoodies", image: "https://i5.walmartimages.com/seo/Hat-and-Beyond-Women-s-Ultra-Soft-Fleece-Hoodie-Customizable-Oversized-Pullover-Hoodie-With-Half-Moon-Patch-For-Custom-Branding_f0e356ec-3da8-45e2-b3ba-4d2bb720d286.aaf8f235753f53b6f0fd56f6943ed925.jpeg", count: 19 },
+    { name: "Accessories", image: "https://nilsonline.lk/image/catalog/nils/accessories/accessories.jpg", count: 27 },
+  ];
+
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await axios.get("http://localhost:5002/api/products", {
-          params: showAll ? {} : { page: currentPage, limit: productsPerPage },
-        });
-        console.log("Raw API Response:", response.data);
-        const fetchedProducts = response.data.products.map((p) => ({
-          ...p,
-          id: p._id,
-          title: p.name,
-        }));
-        setProducts(fetchedProducts);
-        setTotalProducts(response.data.total || fetchedProducts.length);
-        console.log("Mapped Products:", fetchedProducts);
-        console.log("Total Products Set:", response.data.total || fetchedProducts.length);
-      } catch (error) {
-        console.error("Fetch Error:", error.response?.data || error.message);
-        toast.error("Failed to load products");
-      }
-    };
-    fetchProducts();
-  }, [currentPage, productsPerPage, showAll]);
+  const fetchProducts = async () => {
+    try {
+      const response = await axios.get("http://localhost:5002/api/products", {
+        
+        params: showAll
+          ? {
+              gender: filters.gender.join(",") || undefined,
+              category: filters.categories.join(",") || undefined,
+              subcategory: filters.subcategories.join(",") || undefined,
+              minPrice: filters.priceRange[0],
+              maxPrice: filters.priceRange[1],
+              onSale: filters.onSale || undefined,
+              isNew: filters.newArrivals || undefined,
+            }
+          : {
+              page: currentPage,
+              limit: productsPerPage,
+              gender: filters.gender.join(",") || undefined,
+              category: filters.categories.join(",") || undefined,
+              subcategory: filters.subcategories.join(",") || undefined,
+              minPrice: filters.priceRange[0],
+              maxPrice: filters.priceRange[1],
+              onSale: filters.onSale || undefined,
+              isNew: filters.newArrivals || undefined,
+            },
+      });
+      console.log("Backend Response:", response.data); // Add this to debug
+      const fetchedProducts = response.data.products.map((p) => ({
+  ...p,
+  id: p._id,
+  title: p.name,
+  image: p.images[0]?.url || "/placeholder.png",
+}));
+      setProducts(fetchedProducts);
+      setTotalProducts(response.data.total || fetchedProducts.length);
+    } catch (error) {
+      console.error("Fetch Error:", error.response?.data || error.message);
+      toast.error("Failed to load products");
+    }
+  };
+  fetchProducts();
+}, [currentPage, productsPerPage, showAll, filters]);
 
   useEffect(() => {
     console.log("Current Filters:", filters);
     console.log("Displayed Products After Filtering:", filteredProducts.length);
   }, [filters, products]);
 
+  const genders = ["Men", "Women"];
   const categories = ["Marvel", "DC", "Anime", "Custom"];
   const subcategories = [
     "Graphic Printed",
@@ -65,6 +104,7 @@ const ProductListingPage = () => {
     "Sleeveless",
     "Long Sleeve",
     "Hooded",
+    "Crop Top",
   ];
 
   const toggleFilter = (filterType, value) => {
@@ -90,6 +130,7 @@ const ProductListingPage = () => {
 
   const clearFilters = () => {
     setFilters({
+      gender: [],
       categories: [],
       subcategories: [],
       priceRange: [0, 2000],
@@ -100,6 +141,7 @@ const ProductListingPage = () => {
   };
 
   const filteredProducts = products.filter((product) => {
+    if (filters.gender.length > 0 && !filters.gender.includes(product.gender)) return false;
     if (filters.categories.length > 0 && !filters.categories.includes(product.category)) return false;
     if (filters.subcategories.length > 0 && !filters.subcategories.includes(product.subcategory)) return false;
     if (product.price < filters.priceRange[0] || product.price > filters.priceRange[1]) return false;
@@ -239,7 +281,7 @@ const ProductListingPage = () => {
     }
     return stars;
   };
-
+console.log('Products State:', products); // Add before the return statement
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-blue-950 relative overflow-hidden">
       <div id="starry-bg" className="absolute inset-0 overflow-hidden">
@@ -310,6 +352,144 @@ const ProductListingPage = () => {
           <p className="text-blue-300 text-center">{sortedProducts.length} of {totalProducts} products</p>
         </div>
 
+        {/* Men's Collection Banner */}
+        <div className="relative rounded-2xl overflow-hidden mb-12">
+          <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent z-10"></div>
+          <img
+            src="https://wallpaperaccess.com/full/1448078.jpg"
+            alt="Men's Collection"
+            className="w-full h-[400px] md:h-[500px] object-cover"
+          />
+          <div className="absolute inset-0 z-20 flex flex-col justify-center p-8 md:p-16">
+            <h1
+              className="text-4xl md:text-5xl font-bold text-white mb-4"
+              style={{ textShadow: "0 0 10px rgba(100, 200, 255, 0.7)" }}
+            >
+              Men's Collection
+            </h1>
+            <p className="text-blue-300 text-lg md:text-xl max-w-md mb-6">
+              Discover our exclusive range of superhero-inspired apparel designed for the modern hero.
+            </p>
+            <button
+              onClick={() => toggleFilter("gender", "Men")}
+              className="inline-flex items-center bg-blue-900/30 hover:bg-blue-800/50 text-blue-300 py-3 px-6 rounded-lg border border-blue-900/50 backdrop-blur-sm shadow-[0_0_15px_rgba(0,191,255,0.3)] transition-all duration-300 w-fit"
+            >
+              Shop Men <ArrowRight className="ml-2 h-5 w-5" />
+            </button>
+          </div>
+        </div>
+
+        {/* Men's Categories */}
+        <div className="mb-16">
+          <h2
+            className="text-3xl font-bold text-white mb-8 text-center"
+            style={{ textShadow: "0 0 10px rgba(100, 200, 255, 0.7)" }}
+          >
+            Men's Categories
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {menCategories.map((category, index) => (
+              <div
+                key={index}
+                className="group relative rounded-xl overflow-hidden bg-black/40 backdrop-blur-md border border-blue-900/50 shadow-[0_0_15px_rgba(0,191,255,0.3)] transition-transform duration-300 hover:scale-105"
+              >
+                <div className="aspect-square overflow-hidden">
+                  <img
+                    src={category.image || "/placeholder.svg"}
+                    alt={category.name}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center">
+                    <h3
+                      className="text-xl font-bold text-white mb-2"
+                      style={{ textShadow: "0 0 10px rgba(100, 200, 255, 0.7)" }}
+                    >
+                      {category.name}
+                    </h3>
+                    <p className="text-blue-300 mb-4">{category.count} Products</p>
+                    <button
+                      onClick={() => toggleFilter("subcategories", category.name)}
+                      className="bg-blue-900/30 hover:bg-blue-800/50 text-blue-300 py-2 px-4 rounded-lg border border-blue-900/50 backdrop-blur-sm shadow-[0_0_10px_rgba(0,191,255,0.3)] transition-all duration-300"
+                    >
+                      View All
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Women's Collection Banner */}
+        <div className="relative rounded-2xl overflow-hidden mb-12">
+          <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent z-10"></div>
+          <img
+            src="https://nilsonline.lk/image/catalog/nils/accessories/accessories.jpg"
+            alt="Women's Collection"
+            className="w-full h-[400px] md:h-[500px] object-cover"
+          />
+          <div className="absolute inset-0 z-20 flex flex-col justify-center p-8 md:p-16">
+            <h1
+              className="text-4xl md:text-5xl font-bold text-white mb-4"
+              style={{ textShadow: "0 0 10px rgba(100, 200, 255, 0.7)" }}
+            >
+              Women's Collection
+            </h1>
+            <p className="text-blue-300 text-lg md:text-xl max-w-md mb-6">
+              Embrace your inner heroine with our exclusive range of superhero-inspired women's apparel.
+            </p>
+            <button
+              onClick={() => toggleFilter("gender", "Women")}
+              className="inline-flex items-center bg-blue-900/30 hover:bg-blue-800/50 text-blue-300 py-3 px-6 rounded-lg border border-blue-900/50 backdrop-blur-sm shadow-[0_0_15px_rgba(0,191,255,0.3)] transition-all duration-300 w-fit"
+            >
+              Shop Women <ArrowRight className="ml-2 h-5 w-5" />
+            </button>
+          </div>
+        </div>
+
+        {/* Women's Categories */}
+        <div className="mb-16">
+          <h2
+            className="text-3xl font-bold text-white mb-8 text-center"
+            style={{ textShadow: "0 0 10px rgba(100, 200, 255, 0.7)" }}
+          >
+            Women's Categories
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {womenCategories.map((category, index) => (
+              <div
+                key={index}
+                className="group relative rounded-xl overflow-hidden bg-black/40 backdrop-blur-md border border-blue-900/50 shadow-[0_0_15px_rgba(0,191,255,0.3)] transition-transform duration-300 hover:scale-105"
+              >
+                <div className="aspect-square overflow-hidden">
+                  <img
+                    src={category.image || "/placeholder.svg"}
+                    alt={category.name}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center">
+                    <h3
+                      className="text-xl font-bold text-white mb-2"
+                      style={{ textShadow: "0 0 10px rgba(100, 200, 255, 0.7)" }}
+                    >
+                      {category.name}
+                    </h3>
+                    <p className="text-blue-300 mb-4">{category.count} Products</p>
+                    <button
+                      onClick={() => toggleFilter("subcategories", category.name)}
+                      className="bg-blue-900/30 hover:bg-blue-800/50 text-blue-300 py-2 px-4 rounded-lg border border-blue-900/50 backdrop-blur-sm shadow-[0_0_10px_rgba(0,191,255,0.3)] transition-all duration-300"
+                    >
+                      View All
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
         <div className="md:hidden mb-4">
           <button
             onClick={() => setIsMobileFilterOpen(true)}
@@ -334,6 +514,34 @@ const ProductListingPage = () => {
                   <button onClick={clearFilters} className="text-sm text-blue-400 hover:text-blue-300">
                     Clear all
                   </button>
+                </div>
+
+                <div className="mb-6 border-b border-blue-900/30 pb-6">
+                  <button
+                    onClick={() => toggleExpandFilter("gender")}
+                    className="flex items-center justify-between w-full text-left font-medium text-blue-300 mb-3"
+                  >
+                    <span>Gender</span>
+                    {expandedFilters.gender ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                  </button>
+                  {expandedFilters.gender && (
+                    <div className="space-y-2">
+                      {genders.map((gen) => (
+                        <div key={gen} className="flex items-center">
+                          <input
+                            id={`gender-${gen}`}
+                            type="checkbox"
+                            checked={filters.gender.includes(gen)}
+                            onChange={() => toggleFilter("gender", gen)}
+                            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-blue-300 rounded"
+                          />
+                          <label htmlFor={`gender-${gen}`} className="ml-2 text-sm text-blue-300">
+                            {gen}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 <div className="mb-6 border-b border-blue-900/30 pb-6">
@@ -498,6 +706,26 @@ const ProductListingPage = () => {
                       </div>
 
                       <div className="mb-6 border-b border-blue-900/30 pb-6">
+                        <h3 className="font-medium text-blue-300 mb-3">Gender</h3>
+                        <div className="space-y-2">
+                          {genders.map((gen) => (
+                            <div key={gen} className="flex items-center">
+                              <input
+                                id={`mobile-gender-${gen}`}
+                                type="checkbox"
+                                checked={filters.gender.includes(gen)}
+                                onChange={() => toggleFilter("gender", gen)}
+                                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-blue-300 rounded"
+                              />
+                              <label htmlFor={`mobile-gender-${gen}`} className="ml-2 text-sm text-blue-300">
+                                {gen}
+                              </label>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="mb-6 border-b border-blue-900/30 pb-6">
                         <h3 className="font-medium text-blue-300 mb-3">Categories</h3>
                         <div className="space-y-2">
                           {categories.map((cat) => (
@@ -618,13 +846,23 @@ const ProductListingPage = () => {
               </div>
             </div>
 
-            {(filters.categories.length > 0 ||
+            {(filters.gender.length > 0 ||
+              filters.categories.length > 0 ||
               filters.subcategories.length > 0 ||
               filters.onSale ||
               filters.newArrivals) && (
               <div className="mb-6">
                 <h3 className="text-sm font-medium text-blue-300 mb-2">Active Filters:</h3>
                 <div className="flex flex-wrap gap-2">
+                  {filters.gender.map((gen) => (
+                    <button
+                      key={`filter-${gen}`}
+                      onClick={() => toggleFilter("gender", gen)}
+                      className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-900/30 text-blue-300 border border-blue-900/50 backdrop-blur-sm"
+                    >
+                      {gen} <X size={14} className="ml-1" />
+                    </button>
+                  ))}
                   {filters.categories.map((cat) => (
                     <button
                       key={`filter-${cat}`}
@@ -665,10 +903,59 @@ const ProductListingPage = () => {
 
             {sortedProducts.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {sortedProducts.map((product) => (
-                  <ProductCard key={product.id} product={product} />
+  {sortedProducts.map((product) => {
+    console.log('Rendering product:', product.title, 'Image:', product.image); // Debug log
+    return (
+      <div
+        key={product.id}
+        className="group relative rounded-xl overflow-hidden transform transition-all duration-300 hover:scale-105"
+      >
+        <div className="bg-black/40 backdrop-blur-md border border-blue-900/50 rounded-xl overflow-hidden shadow-[0_0_15px_rgba(0,191,255,0.3)]">
+          <div className="relative aspect-[3/4] overflow-hidden">
+            <img
+              src={product.image || "https://via.placeholder.com/150"} // Use product.image and external placeholder
+              alt={product.title}
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            {product.isNew && (
+              <div className="absolute top-2 left-2">
+                <span className="bg-blue-500/70 text-white text-xs font-bold px-2 py-1 rounded-md backdrop-blur-sm">
+                  NEW
+                </span>
+              </div>
+            )}
+          </div>
+          <div className="p-4">
+            <h3 className="text-blue-300 font-medium text-sm mb-1 line-clamp-2">{product.title}</h3>
+            <div className="flex items-center mb-2">
+              <div className="flex items-center">
+                {[...Array(5)].map((_, i) => (
+                  <Star
+                    key={i}
+                    size={14}
+                    className={i < Math.floor(product.rating) ? "text-yellow-400 fill-current" : "text-gray-400"}
+                    fillOpacity={i < Math.floor(product.rating) ? 1 : 0}
+                  />
                 ))}
               </div>
+              <span className="text-blue-300 text-xs ml-1">{product.rating}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-blue-300 font-bold">₹{product.price}</span>
+              <Link
+                to={`/products/${product.id}`}
+                className="text-blue-400 text-sm hover:text-blue-300"
+              >
+                View Details
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  })}
+</div>
             ) : (
               <div className="text-center py-12 bg-black/40 backdrop-blur-md rounded-lg border border-blue-900/50 shadow-[0_0_15px_rgba(0,191,255,0.3)]">
                 <h3 className="text-lg font-medium text-blue-300 mb-2">No products found</h3>
@@ -689,7 +976,7 @@ const ProductListingPage = () => {
                     onClick={() => handlePageChange(currentPage - 1)}
                     disabled={currentPage === 1}
                     className={`px-2 py-1 border border-blue-900/50 rounded-l-md text-sm font-medium text-blue-300 ${
-                      currentPage === 1_1 ? "opacity-50 cursor-not-allowed" : "hover:bg-blue-900/30"
+                      currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-blue-900/30"
                     }`}
                   >
                     Previous

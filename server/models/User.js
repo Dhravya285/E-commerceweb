@@ -1,4 +1,3 @@
-// User.js
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
@@ -14,7 +13,7 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: function() {
-      return !this.googleId;
+      return !this.googleId && this.authProvider === 'local';
     },
   },
   googleId: {
@@ -23,7 +22,7 @@ const userSchema = new mongoose.Schema({
     sparse: true,
   },
   profilePicture: { type: String, default: '' },
-  phone: { type: String, default: '' }, // Add phone field
+  phone: { type: String, default: '' },
   bio: { type: String, default: '' },
   socialLinks: { type: Map, of: String },
   isVerified: {
@@ -38,6 +37,11 @@ const userSchema = new mongoose.Schema({
   isGuest: {
     type: Boolean,
     default: false,
+  },
+  role: {
+    type: String,
+    enum: ['admin', 'vendor', 'customer'],
+    default: 'customer',
   },
   createdAt: {
     type: Date,

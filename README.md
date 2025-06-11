@@ -108,3 +108,9 @@ cp .env.example .env
 
 # Start the development server
 npm run dev
+
+"productId":"6839be5ef4477f23df57b2ab",
+    "userId":"681a05d8b152a3b0f78046e9"
+    sb-bcvpc43321485@personal.example.com
+    qXB[@4|*     qXB[@4|*
+    

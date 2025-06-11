@@ -1,4 +1,4 @@
-"use client"
+
 
 import { useState } from "react"
 import { Link } from "react-router-dom"
@@ -15,11 +15,13 @@ import {
   Plus,
   Minus,
 } from "lucide-react"
+const { id } = useParams();
+console.log("Product detail page ID:", id);
 
 export default function ProductDetail(props) {
   const product = props.product
-
-  const [mainImage, setMainImage] = useState(product.images[0])
+// ProductDetail.jsx
+const [mainImage, setMainImage] = useState(product.images[0]?.url || '/placeholder.svg');
   const [quantity, setQuantity] = useState(1)
   const [selectedSize, setSelectedSize] = useState("")
   const [selectedColor, setSelectedColor] = useState("")
@@ -210,7 +212,7 @@ export default function ProductDetail(props) {
               />
             </div>
 
-            {/* Thumbnail Images
+            
             <div className="grid grid-cols-5 gap-2 transform -rotate-1">
               {product.images.map((image, index) => (
                 <button
@@ -229,7 +231,7 @@ export default function ProductDetail(props) {
                   />
                 </button>
               ))}
-            </div> */}
+            </div>
 
             {/* Comic-style decorative element */}
             <div className="absolute -top-6 -right-6 transform rotate-12 z-20 hidden md:block">

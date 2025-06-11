@@ -5,28 +5,28 @@ const categories = [
     id: "marvel",
     name: "Marvel Universe",
     image: "https://image.api.playstation.com/vulcan/ap/rnd/202306/1219/97e9f5fa6e50c185d249956c6f198a2652a9217e69a59ecd.jpg",
-    count: 42,
+    
     color: "from-red-600 to-red-900",
   },
   {
     id: "dc",
     name: "DC Comics",
     image: "https://tse3.mm.bing.net/th?id=OIP.CPaOZraDmB5OpVnNiq08qwHaFz&pid=Api&P=0&h=180",
-    count: 38,
+    
     color: "from-blue-600 to-blue-900",
   },
   {
     id: "anime",
     name: "Anime Superheroes",
     image: "https://i.pinimg.com/originals/72/ed/57/72ed573173150abcbe4f5ed701d666f6.jpg",
-    count: 27,
+    
     color: "from-purple-600 to-purple-900",
   },
   {
     id: "classic",
     name: "Classic Comics",
     image: "https://tse2.mm.bing.net/th?id=OIP.UITiw8ukJdMLdoJvkYOMkAHaEO&pid=Api&P=0&h=180",
-    count: 31,
+    
     color: "from-green-600 to-green-900",
   },
 ]
@@ -46,7 +46,7 @@ export default function FeaturedCategories() {
           {categories.map((category) => (
             <Link
               key={category.id}
-              to={`/shop/category/${category.id}`}
+              to={`/products`}
               className="group relative overflow-hidden rounded-lg h-80 shadow-xl"
             >
               {/* Background image */}

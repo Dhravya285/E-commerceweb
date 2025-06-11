@@ -1,32 +1,51 @@
-// middleware/auth.js
 const jwt = require('jsonwebtoken');
-const asyncHandler = require('express-async-handler');
 const User = require('../models/User');
 
-const protect = asyncHandler(async (req, res, next) => {
+const protect = async (req, res, next) => {
   let token;
+  const authHeader = req.headers.authorization;
+  console.log('Protect middleware - Authorization header:', authHeader || 'missing');
 
-  if (
-    req.headers.authorization &&
-    req.headers.authorization.startsWith('Bearer')
-  ) {
+  if (authHeader && authHeader.startsWith('Bearer')) {
     try {
-      token = req.headers.authorization.split(' ')[1];
+      token = authHeader.split(' ')[1];
+      console.log('Protect middleware - Token received:', token.substring(0, 10) + '...');
+
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      req.user = await User.findById(decoded.id).select('-password');
-      if (!req.user) {
-        res.status(401);
-        throw new Error('Not authorized, user not found');
+      console.log('Protect middleware - Decoded JWT:', decoded);
+
+      const userId = decoded._id || decoded.id || decoded.sub;
+      if (!userId) {
+        console.log('Protect middleware - No userId in JWT payload:', decoded);
+        return res.status(401).json({ message: 'Not authorized, invalid token payload' });
       }
+
+      const user = await User.findById(userId).select('-password');
+      if (!user) {
+        console.log(`Protect middleware - User not found for ID: ${userId}`);
+        return res.status(401).json({ message: 'Not authorized, user not found' });
+      }
+
+      req.user = {
+        ...user.toObject(),
+        userId: user._id.toString(),
+        id: user._id.toString(), // Ensure compatibility with WishlistController
+        isAdmin: user.role === 'admin',
+      };
+      console.log(`Protect middleware - User authenticated: ${user.name}, Role: ${user.role}, userId: ${req.user.userId}`);
+
       next();
     } catch (error) {
-      res.status(401);
-      throw new Error('Not authorized, token failed');
+      console.error('Protect middleware - Error:', {
+        message: error.message,
+        name: error.name,
+      });
+      return res.status(401).json({ message: 'Not authorized, token failed' });
     }
   } else {
-    res.status(401);
-    throw new Error('Not authorized, no token');
+    console.log('Protect middleware - No token provided or invalid format');
+    return res.status(401).json({ message: 'Not authorized, no token' });
   }
-});
+};
 
 module.exports = { protect };
