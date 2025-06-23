@@ -10,7 +10,7 @@ const cartRoutes = require('./routes/cartRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
 const paypalRoutes = require('./routes/paymentRoutes'); 
 const settingsRoutes = require('./routes/settingsRoutes');
-const analyticsRoutes = require('./routes/AnalyticsRoutes');
+const analyticsRoutes = require('./routes/AnalyticsRoutes')
 const discountRoutes = require('./routes/discountRoutes');
 const queryRoutes = require('./routes/queryRoutes');
 const newsletterRoutes = require('./routes/newsletterRoutes');
@@ -27,7 +27,7 @@ app.use(express.json());
 app.use("/uploads", express.static(path.join(__dirname, "Uploads")));
 
 const corsOptions = {
-  origin: "http://localhost:5173",
+  origin: "*",
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true,
 };
@@ -66,6 +66,11 @@ app.use('/api/discounts', discountRoutes);
 app.use('/api/queries', queryRoutes);
 app.use('/api/newsletter', newsletterRoutes);
 
+
+
+app.get("/hello",(req,res)=>{
+  res.json({message:"Hello from the server!"});
+})
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error("Server Error:", err.stack);
