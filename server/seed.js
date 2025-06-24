@@ -123,8 +123,13 @@ const seedDB = async () => {
   try {
     await ensureUploadsDir();
     const products = await generateProducts();
-    await Product.deleteMany({});
-    console.log('Cleared existing products');
+   const productCount = await Product.countDocuments();
+if (productCount > 0) {
+  console.log('⚠️ Products already exist. Skipping seeding.');
+  mongoose.connection.close();
+  return;
+}
+
 
     const seededProducts = [];
 
