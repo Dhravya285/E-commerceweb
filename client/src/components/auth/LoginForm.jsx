@@ -22,7 +22,7 @@ const LoginForm = () => {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:5002/api/auth/login", {
+      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -68,7 +68,7 @@ const LoginForm = () => {
   const handleGoogleSuccess = async (credentialResponse) => {
     try {
       const token = credentialResponse.credential;
-      const res = await axios.post('http://localhost:5002/api/google', { token });
+      const res = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/auth/google`, { token });
 
       if (res.data?.token && res.data?.user) {
         localStorage.setItem("token", res.data.token);

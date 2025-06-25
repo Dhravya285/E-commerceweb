@@ -13,7 +13,7 @@ const Discounts = () => {
     const fetchDiscounts = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:5002/api/discounts', {
+        const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/discounts`, {
           headers: { Authorization: `Bearer ${token}` },
           params: { search: searchQuery },
         });

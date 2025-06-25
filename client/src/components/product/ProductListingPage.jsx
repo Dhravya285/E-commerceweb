@@ -48,7 +48,7 @@ const ProductListingPage = () => {
   useEffect(() => {
   const fetchProducts = async () => {
     try {
-      const response = await axios.get("http://localhost:5002/api/products", {
+      const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/products`, {
         
         params: showAll
           ? {

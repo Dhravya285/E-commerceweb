@@ -21,7 +21,7 @@ const Customers = () => {
     }
 
     try {
-      const response = await axios.get('http://localhost:5002/api/users/admin', {
+      const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/users/admin`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const validatedCustomers = Array.isArray(response.data)
@@ -65,7 +65,7 @@ const Customers = () => {
     }
 
     try {
-      const response = await axios.get('http://localhost:5002/api/queries/admin', {
+      const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/queries/admin`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setQueries(Array.isArray(response.data) ? response.data : []);

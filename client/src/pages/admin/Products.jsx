@@ -14,7 +14,7 @@ const Products = () => {
   const fetchProducts = async (query = '') => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:5002/api/products', {
+      const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/products`, {
         params: { name: query }, // Pass search query as a parameter
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -34,7 +34,7 @@ const Products = () => {
   const deleteProduct = async (id) => {
     if (!window.confirm('Are you sure you want to delete this product?')) return;
     try {
-      await axios.delete(`http://localhost:5002/api/products/${id}`, {
+      await axios.delete(`${process.env.REACT_APP_API_BASE_URL}/api/products/${id}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },

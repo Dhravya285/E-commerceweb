@@ -28,7 +28,7 @@ const ViewQuery = () => {
       }
 
       try {
-        const response = await axios.get(`http://localhost:5002/api/queries/${id}`, {
+        const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/queries/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setQuery(response.data);

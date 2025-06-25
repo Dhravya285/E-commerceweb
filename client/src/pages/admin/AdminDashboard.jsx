@@ -50,17 +50,17 @@ const AdminDashboard = () => {
       setLoading(true);
 
       // Fetch analytics data
-      const analyticsResponse = await axios.get('http://localhost:5002/api/analytics', {
+      const analyticsResponse = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/analytics`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
       // Fetch recent orders
-      const ordersResponse = await axios.get('http://localhost:5002/api/orders/admin', {
+      const ordersResponse = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/orders/admin`,{
         headers: { Authorization: `Bearer ${token}` },
       });
 
       // Fetch top products
-      const productsResponse = await axios.get('http://localhost:5002/api/products', {
+      const productsResponse = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/products`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

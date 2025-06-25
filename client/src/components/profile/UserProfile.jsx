@@ -36,7 +36,7 @@ const UserProfilePage = () => {
       return;
     }
     try {
-      const res = await axios.get("http://localhost:5002/api/users/me", {
+      const res = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/users/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setUserData({
@@ -92,10 +92,10 @@ const fetchOrdersAndWishlist = async () => {
 
   try {
     const [ordersRes, wishlistRes] = await Promise.all([
-      axios.get("http://localhost:5002/api/orders", {
+      axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/orders`, {
         headers: { Authorization: `Bearer ${token}` },
       }),
-      axios.get("http://localhost:5002/api/wishlist", {
+      axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/wishlist`, {
         headers: { Authorization: `Bearer ${token}` },
       }),
     ]);
@@ -215,7 +215,7 @@ const fetchOrdersAndWishlist = async () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.put("http://localhost:5002/api/users/me", profileData, {
+      const res = await axios.put(`${process.env.REACT_APP_API_BASE_URL}/api/users/me`, profileData, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setUserData(res.data);
@@ -233,7 +233,7 @@ const handleCancelOrder = async (orderId) => {
     const token = localStorage.getItem("token");
     console.log(`Cancelling order ID: ${orderId}`);
     const response = await axios.put(
-      `http://localhost:5002/api/paypal/orders/${orderId}/cancel`,
+     `${process.env.REACT_APP_API_BASE_URL}/orders/${orderId}/cancel`,
       {},
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -276,7 +276,7 @@ const handleCancelOrder = async (orderId) => {
       const formData = new FormData();
       formData.append("profilePicture", file);
       try {
-        const res = await axios.post("http://localhost:5002/api/users/upload-avatar", formData, {
+        const res = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/users/upload-avatar`, formData, {
           headers: {
             "Content-Type": "multipart/form-data",
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -309,12 +309,12 @@ const handleCancelOrder = async (orderId) => {
       let res;
       if (selectedAddress) {
         res = await axios.put(
-          `http://localhost:5002/api/users/addresses/${selectedAddress._id}`,
+         `${process.env.REACT_APP_API_BASE_URL}/api/users/addresses/${selectedAddress._id}`,
           addressData,
           { headers: { Authorization: `Bearer ${token}` } }
         );
       } else {
-        res = await axios.post("http://localhost:5002/api/users/addresses", addressData, {
+        res = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/users/addresses`, addressData, {
           headers: { Authorization: `Bearer ${token}` },
         });
       }
@@ -342,7 +342,7 @@ const handleCancelOrder = async (orderId) => {
   const handleDeleteAddress = async (addressId) => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.delete(`http://localhost:5002/api/users/addresses/${addressId}`, {
+      const res = await axios.delete(`${process.env.REACT_APP_API_BASE_URL}/api/users/addresses/${addressId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setUserData((prev) => ({
@@ -372,7 +372,7 @@ const handleCancelOrder = async (orderId) => {
   const handleRemoveFromWishlist = async (wishlistItemId) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:5002/api/wishlist/${wishlistItemId}`, {
+      await axios.delete(`${process.env.REACT_APP_API_BASE_URL}/api/wishlist/${wishlistItemId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setWishlist((prev) => prev.filter((item) => item._id !== wishlistItemId));
@@ -436,7 +436,7 @@ const handleCancelOrder = async (orderId) => {
     };
 
     console.log("Add to Cart - Sending request:", { cartItem, headers: { Authorization: `Bearer ${token}` } });
-    const response = await axios.post("http://localhost:5002/api/cart", cartItem, { // Updated endpoint
+    const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/cart`, cartItem, { // Updated endpoint
       headers: { Authorization: `Bearer ${token}` },
     });
     console.log("Add to Cart - Response:", response.data);

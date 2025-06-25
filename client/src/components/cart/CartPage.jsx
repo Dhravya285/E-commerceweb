@@ -50,7 +50,7 @@ const CartPage = () => {
         }
 
         console.log("Fetching cart - userId:", userId);
-        const response = await axios.get("http://localhost:5002/api/cart", {
+        const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/cart`, {
           headers: { Authorization: `Bearer ${token}` },
           params: { userId },
         });
@@ -128,7 +128,7 @@ const CartPage = () => {
       if (userId && token) {
         console.log("Adding to cart for userId:", userId, cartItem);
         const response = await axios.post(
-          "http://localhost:5002/api/cart",
+          `${process.env.REACT_APP_API_BASE_URL}/api/cart`,
           cartItem,
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -166,7 +166,7 @@ const CartPage = () => {
       const token = localStorage.getItem("token");
       if (userId && token) {
         const response = await axios.put(
-          "http://localhost:5002/api/cart/update",
+         `${process.env.REACT_APP_API_BASE_URL}/api/cart/update`,
           { userId, productId: id, size, color, quantity: newQuantity },
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -193,7 +193,7 @@ const CartPage = () => {
       const userId = localStorage.getItem("userId");
       const token = localStorage.getItem("token");
       if (userId && token) {
-        const response = await axios.delete("http://localhost:5002/api/cart/remove", {
+        const response = await axios.delete(`${process.env.REACT_APP_API_BASE_URL}/api/cart/remove`, {
           data: { userId, productId: id, size, color },
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -217,7 +217,7 @@ const CartPage = () => {
       const userId = localStorage.getItem("userId");
       const token = localStorage.getItem("token");
       if (userId && token) {
-        const response = await axios.delete("http://localhost:5002/api/cart/clear", {
+        const response = await axios.delete(`${process.env.REACT_APP_API_BASE_URL}/api/cart/clear`, {
           data: { userId },
           headers: { Authorization: `Bearer ${token}` },
         });

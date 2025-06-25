@@ -44,7 +44,7 @@ const SignupForm = () => {
   const handleSendOtp = async () => {
     setLoading(true)
     try {
-      const response = await fetch("http://localhost:5002/api/auth/send-otp", {
+      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/auth/send-otp`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -69,7 +69,7 @@ const SignupForm = () => {
   const handleVerifyOtp = async () => {
     setLoading(true)
     try {
-      const response = await fetch("http://localhost:5002/api/auth/verify-otp", {
+      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/auth/verify-otp`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -117,7 +117,7 @@ const SignupForm = () => {
         }
         console.log("Sending signup data:", payload)
 
-        const response = await fetch("http://localhost:5002/api/auth/signup", {
+        const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/auth/signup`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

@@ -24,7 +24,7 @@ const AdminLogin = () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:5002/api/auth/admin/login', {
+      const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/auth/admin/login`, {
         email: email.toLowerCase(),
         password,
       });

@@ -14,7 +14,7 @@ const Notifications = () => {
       try {
         const token = localStorage.getItem('token');
         const headers = token ? { Authorization: `Bearer ${token}` } : {};
-        const response = await axios.get('http://localhost:5002/api/discounts/public', {
+        const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/discounts/public`, {
           headers,
         });
         console.log('Discounts fetched:', response.data);
