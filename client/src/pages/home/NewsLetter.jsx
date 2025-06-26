@@ -16,7 +16,7 @@ export default function Newsletter() {
     setError("");
 
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/newsletter/subscribe`, { email });
+      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/newsletter/subscribe`, { email });
       setIsSubmitted(true);
     } catch (err) {
       const errorMessage = err.response?.data?.message || "Failed to subscribe. Please try again.";

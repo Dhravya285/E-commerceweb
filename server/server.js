@@ -17,7 +17,7 @@ const newsletterRoutes = require('./routes/newsletterRoutes');
 
 const cors = require("cors");
 const connectDB = require("./config/db");
-// const helmet = require("helmet");
+const helmet = require("helmet");
 const path = require("path");
 
 const app = express();
@@ -33,19 +33,18 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
-// app.use(helmet());
-// app.use(
-//   helmet.contentSecurityPolicy({
-//     directives: {
-//       defaultSrc: ["'self'"],
-//       imgSrc: ["'self'", "http://localhost:5002", "http://localhost:5173", "data:", "https://res.cloudinary.com"],
-//       connectSrc: ["'self'", "http://localhost:5002", "http://localhost:5173"],
-//       scriptSrc: ["'self'", "'unsafe-inline'"],
-//       styleSrc: ["'self'", "'unsafe-inline'"],
-//       fontSrc: ["'self'"],
-//     },
-//   })
-// );
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"],
+      imgSrc: ["'self'", "data:", "https://res.cloudinary.com", "https://*.google.com"],
+      connectSrc: ["'self'", "https://e-commerceweb-g4hq.onrender.com", "https://e-commerceweb-nine.vercel.app", "https://accounts.google.com"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "https://accounts.google.com"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      fontSrc: ["'self'"],
+    },
+  })
+);
 
 // Connect to MongoDB
 connectDB();

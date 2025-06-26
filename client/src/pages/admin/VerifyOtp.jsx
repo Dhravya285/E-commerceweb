@@ -27,7 +27,7 @@ const VerifyOtp = () => {
     }
 
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/auth/verify-otp`, { email, otp });
+      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/auth/verify-otp`, { email, otp });
       toast.success(response.data.message);
       navigate(`/admin/signup?email=${encodeURIComponent(email)}&role=${encodeURIComponent(role)}`);
     } catch (err) {
@@ -44,7 +44,7 @@ const VerifyOtp = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/auth/send-otp`, { email, role });
+      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/auth/send-otp`, { email, role });
       toast.success(response.data.message);
     } catch (err) {
       const errorMessage = err.response?.data?.message || 'Failed to resend OTP';

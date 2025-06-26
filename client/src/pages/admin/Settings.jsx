@@ -37,7 +37,7 @@ const AdminSettings = () => {
     }
 
     try {
-      const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/settings`, {
+      const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/settings`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const { adminName, adminEmail, storeName, currency } = response.data;
@@ -96,7 +96,7 @@ const AdminSettings = () => {
 
     try {
       const response = await axios.put(
-        `${process.env.REACT_APP_API_BASE_URL}/api/settings`,
+        `${import.meta.env.VITE_API_BASE_URL}/api/settings`,
         {
           adminName,
           adminEmail,

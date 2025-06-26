@@ -30,7 +30,7 @@ const AddDiscount = () => {
       }
       console.log('Submitting discount:', formData); // Debug
       const response = await axios.post(
-       `${process.env.REACT_APP_API_BASE_URL}/api/discounts`,
+       `${import.meta.env.VITE_API_BASE_URL}/api/discounts`,
         {
           code: formData.code.toUpperCase(),
           discountPercentage: Number(formData.discountPercentage),

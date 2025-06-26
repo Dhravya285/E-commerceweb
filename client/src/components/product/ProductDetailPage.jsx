@@ -39,7 +39,7 @@ const ProductDetailPage = () => {
 
       try {
         // Fetch product
-        const productResponse = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/products/${id}`);
+        const productResponse = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/products/${id}`);
         console.log("Fetched Product Data:", productResponse.data);
         const productData = productResponse.data;
         const formattedProduct = {
@@ -68,7 +68,7 @@ const ProductDetailPage = () => {
         setSelectedColor(formattedProduct.colors[0]?.name || "");
 
         // Fetch reviews
-        const reviewsResponse = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/reviews/product/${id}`);
+        const reviewsResponse = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/reviews/product/${id}`);
         console.log("Fetched Reviews Data:", reviewsResponse.data);
         setReviews(reviewsResponse.data.reviews || []);
 
@@ -92,7 +92,7 @@ const ProductDetailPage = () => {
         }
 
         if (userId && token) {
-          const wishlistResponse = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/wishlist`, {
+          const wishlistResponse = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/wishlist`, {
             headers: { Authorization: `Bearer ${token}` },
           });
           console.log("Wishlist API Response:", {
@@ -164,7 +164,7 @@ const ProductDetailPage = () => {
     try {
       if (userId && token) {
         if (isFavorite) {
-          await axios.delete(`${process.env.REACT_APP_API_BASE_URL}/api/wishlist/${wishlistItemId}`, {
+          await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/wishlist/${wishlistItemId}`, {
             headers: { Authorization: `Bearer ${token}` },
           });
           setIsFavorite(false);
@@ -173,7 +173,7 @@ const ProductDetailPage = () => {
           window.dispatchEvent(new Event("wishlistUpdated"));
         } else {
           const response = await axios.post(
-            `${process.env.REACT_APP_API_BASE_URL}/api/wishlist`,
+            `${import.meta.env.VITE_API_BASE_URL}/api/wishlist`,
             { productId: product.id },
             { headers: { Authorization: `Bearer ${token}` } }
           );
@@ -275,7 +275,7 @@ const ProductDetailPage = () => {
 
     console.log('Add to Cart - Sending request:', { cartItem, headers: { Authorization: `Bearer ${token}` } });
     const response = await axios.post(
-      `${process.env.REACT_APP_API_BASE_URL}/api/cart/add`, // Updated endpoint
+      `${import.meta.env.VITE_API_BASE_URL}/api/cart/add`, // Updated endpoint
       cartItem,
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -302,7 +302,7 @@ const ProductDetailPage = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.post(
-        `${process.env.REACT_APP_API_BASE_URL}/api/reviews`,
+        `${import.meta.env.VITE_API_BASE_URL}/api/reviews`,
         {
           productId: id,
           rating: newReview.rating,

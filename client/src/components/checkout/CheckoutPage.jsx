@@ -183,7 +183,7 @@ const CheckoutPage = () => {
         if (userId && token && isMounted.current) {
           console.log(`Fetching cart from backend for userId: ${userId}`);
           try {
-            const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/cart`, {
+            const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, {
               headers: { Authorization: `Bearer ${token}` },
               params: { userId },
               timeout: 10000,
@@ -205,7 +205,7 @@ const CheckoutPage = () => {
                 const cleanedCart = cleanCartItems(cartData);
                 console.log('Cleaned cart for backend:', JSON.stringify(cleanedCart, null, 2));
                 await axios.put(
-                 `${process.env.REACT_APP_API_BASE_URL}/api/cart/update`,
+                 `${import.meta.env.VITE_API_BASE_URL}/api/cart/update`,
                   { userId, items: cleanedCart },
                   {
                     headers: { Authorization: `Bearer ${token}` },
@@ -291,7 +291,7 @@ const applyCoupon = async () => {
     
 
    try {
-      const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/discounts/apply`, {
+      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/discounts/apply`, {
         code: couponCode.toUpperCase(),
         subtotal,
       });
@@ -320,7 +320,7 @@ const applyCoupon = async () => {
         console.log("Submitting order...");
         const token = localStorage.getItem("token");
         const response = await axios.post(
-        `${process.env.REACT_APP_API_BASE_URL}/api/orders`,
+        `${import.meta.env.VITE_API_BASE_URL}/api/orders`,
           {
             user: {
               firstName: formData.firstName,
@@ -738,7 +738,7 @@ const applyCoupon = async () => {
                 throw new Error("No authentication token found");
               }
               const response = await axios.post(
-                `${process.env.REACT_APP_API_BASE_URL}/api/paypal/create-order`,
+                `${import.meta.env.VITE_API_BASE_URL}/api/paypal/create-order`,
                 {
                   formData,
                   cartItems: cartItems.map((item) => ({
@@ -788,7 +788,7 @@ const applyCoupon = async () => {
                 throw new Error("No authentication token found");
               }
               const response = await axios.post(
-               `${process.env.REACT_APP_API_BASE_URL}/api/paypal/capture-order`,
+               `${import.meta.env.VITE_API_BASE_URL}/api/paypal/capture-order`,
                 { orderID: data.orderID },
                 {
                   headers: { Authorization: `Bearer ${token}` },

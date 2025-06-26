@@ -20,7 +20,7 @@ const Orders = () => {
 
     console.log('Fetching orders with token:', token.substring(0, 20) + '...');
     try {
-      const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/orders/admin`, {
+      const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/orders/admin`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const validatedOrders = Array.isArray(response.data)
@@ -66,7 +66,7 @@ const Orders = () => {
       const token = localStorage.getItem('token');
       console.log(`Updating order ID: ${orderId} to status: ${newStatus}`);
       const response = await axios.put(
-      `${process.env.REACT_APP_API_BASE_URL}/api/paypal/orders/${orderId}/tracking`,
+      `${import.meta.env.VITE_API_BASE_URL}/api/paypal/orders/${orderId}/tracking`,
         { orderStatus: newStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );

@@ -16,7 +16,7 @@ export default function Footer() {
     }
     setIsSubmitting(true);
     try {
-      await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/queries`, query);
+      await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/queries`, query);
       toast.success("Query submitted successfully!");
       setQuery({ name: "", email: "", message: "" });
     } catch (error) {

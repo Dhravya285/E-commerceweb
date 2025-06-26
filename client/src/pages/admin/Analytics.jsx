@@ -49,7 +49,7 @@ const Analytics = () => {
     }
 
     try {
-      const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/analytics`, {
+      const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/analytics`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setAnalyticsData({

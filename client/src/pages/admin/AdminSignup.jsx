@@ -54,7 +54,7 @@ const AdminSignup = () => {
 
     try {
       const normalizedEmail = email.toLowerCase();
-      await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/auth/send-otp`, { email: normalizedEmail, role });
+      await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/auth/send-otp`, { email: normalizedEmail, role });
       // Store form data in local storage
       localStorage.setItem('adminSignupData', JSON.stringify({ name, email: normalizedEmail, password, role }));
       setOtpSent(true);
@@ -73,7 +73,7 @@ const AdminSignup = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/auth/admin/signup`, {
+      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/auth/admin/signup`, {
         ...signupData,
         email: signupData.email.toLowerCase(),
       });
